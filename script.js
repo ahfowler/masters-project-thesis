@@ -26,9 +26,9 @@ async function onResults(results) {
     if (results.rightHandLandmarks) {
         // console.log(results.rightHandLandmarks);
 
-        drawingUtils.drawConnectors(
-            canvasCtx, results.rightHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-            { color: 'white' });
+        // drawingUtils.drawConnectors(
+        //     canvasCtx, results.rightHandLandmarks, mpHolistic.HAND_CONNECTIONS,
+        //     { color: 'white' });
 
         drawingUtils.drawLandmarks(canvasCtx, results.rightHandLandmarks, {
             color: 'white',
@@ -77,7 +77,7 @@ async function onResults(results) {
 
                 // using a minimum match score of 8.5 (out of 10)
                 const estimatedGestures = GE.estimate(predictions[i].landmarks, 8.5);
-                console.log(estimatedGestures.gestures[0]);
+                // console.log(estimatedGestures.gestures[0]);
             }
 
         }
@@ -86,18 +86,24 @@ async function onResults(results) {
     if (results.leftHandLandmarks) {
         // console.log(results.leftHandLandmarks);
 
-        drawingUtils.drawConnectors(
-            canvasCtx, results.leftHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-            { color: 'white' });
+        // drawingUtils.drawConnectors(
+        //     canvasCtx, results.leftHandLandmarks, mpHolistic.HAND_CONNECTIONS,
+        //     { color: 'white' });
 
         drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
             color: 'white',
-            fillColor: 'rgb(0,217,231)',
+            fillColor: (data) => {
+                if (data.index == 8) {
+                    return 'red';
+                } else {
+                    return 'white';
+                }
+            },
             lineWidth: 2,
             radius: (data) => {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
-        });
+        })
     }
 
     canvasCtx.restore();
