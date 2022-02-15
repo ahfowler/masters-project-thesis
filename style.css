@@ -78,10 +78,10 @@
     background-color: #FFFFFF;
   }
 
-  #example-application > .box {
+  #example-application > div > .box {
       width: 100px;
       height: 100px;
-      margin: 100px;
+      margin: 10px;
       background-color: aquamarine;
   }
   

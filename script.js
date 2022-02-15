@@ -28,6 +28,65 @@ async function onResults(results) {
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
+    if (predictions.length > 0) {
+        /*
+        `predictions` is an array of objects describing each detected hand, for example:
+        [
+          {
+            handInViewConfidence: 1, // The probability of a hand being present.
+            boundingBox: { // The bounding box surrounding the hand.
+              topLeft: [162.91, -17.42],
+              bottomRight: [548.56, 368.23],
+            },
+            landmarks: [ // The 3D coordinates of each hand landmark.
+              [472.52, 298.59, 0.00],
+              [412.80, 315.64, -6.18],
+              ...
+            ],
+            annotations: { // Semantic groupings of the `landmarks` coordinates.
+              thumb: [
+                [412.80, 315.64, -6.18]
+                [350.02, 298.38, -7.14],
+                ...
+              ],
+              ...
+            }
+          }
+        ]
+        */
+
+        for (var i = 0; i < predictions.length; i++) {
+            const keypoints = predictions[i].landmarks;
+
+            // Log hand keypoints.
+            // for (let i = 0; i < keypoints.length; i++) {
+            //     const [x, y, z] = keypoints[i];
+            //     console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+            // }
+
+            // using a minimum match score of 8.5 (out of 10)
+            const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
+
+            if (estimatedGestures.gestures[0]) {
+                // console.log(estimatedGestures.poseData);
+                document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
+                break;
+            } else {
+                continue;
+                document.getElementById("gesture-name").innerText = "...";
+            }
+
+            // if (estimatedGestures.gestures[0]) {
+            //     console.log(estimatedGestures.gestures[0].name);
+            //     if (estimatedGestures.gestures[0].name == "point") {
+            //         var boxes = document.getElementsByClassName("box");
+            //         checkPointerFingerLocation(predictions, boxes);
+            //     }
+            // }
+        }
+    }
+
+
     if (results.rightHandLandmarks) {
         // console.log(results.rightHandLandmarks);
 
@@ -55,64 +114,8 @@ async function onResults(results) {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
         });
-
-        if (predictions.length > 0) {
-            /*
-            `predictions` is an array of objects describing each detected hand, for example:
-            [
-              {
-                handInViewConfidence: 1, // The probability of a hand being present.
-                boundingBox: { // The bounding box surrounding the hand.
-                  topLeft: [162.91, -17.42],
-                  bottomRight: [548.56, 368.23],
-                },
-                landmarks: [ // The 3D coordinates of each hand landmark.
-                  [472.52, 298.59, 0.00],
-                  [412.80, 315.64, -6.18],
-                  ...
-                ],
-                annotations: { // Semantic groupings of the `landmarks` coordinates.
-                  thumb: [
-                    [412.80, 315.64, -6.18]
-                    [350.02, 298.38, -7.14],
-                    ...
-                  ],
-                  ...
-                }
-              }
-            ]
-            */
-
-            for (var i = 0; i < predictions.length; i++) {
-                const keypoints = predictions[i].landmarks;
-
-                // Log hand keypoints.
-                // for (let i = 0; i < keypoints.length; i++) {
-                //     const [x, y, z] = keypoints[i];
-                //     console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-                // }
-
-                // using a minimum match score of 8.5 (out of 10)
-                const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
-
-                if (estimatedGestures.gestures[0]) {
-                    // console.log(estimatedGestures.poseData);
-                    document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
-                } else {
-                    document.getElementById("gesture-name").innerText = "...";
-                }
-
-                // if (estimatedGestures.gestures[0]) {
-                //     console.log(estimatedGestures.gestures[0].name);
-                //     if (estimatedGestures.gestures[0].name == "point") {
-                //         var boxes = document.getElementsByClassName("box");
-                //         checkPointerFingerLocation(predictions, boxes);
-                //     }
-                // }
-            }
-
-        }
     }
+
 
     if (results.leftHandLandmarks) {
         // console.log(results.leftHandLandmarks);
@@ -142,33 +145,10 @@ async function onResults(results) {
             }
         });
 
-        if (predictions.length > 0) {
-            for (var i = 0; i < predictions.length; i++) {
-                const keypoints = predictions[i].landmarks;
-
-                // using a minimum match score of 8.5 (out of 10)
-                const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
-
-                if (estimatedGestures.gestures[0]) {
-                    // console.log(estimatedGestures.poseData);
-                    document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
-                } else {
-                    document.getElementById("gesture-name").innerText = "...";
-                }
-
-                // if (estimatedGestures.gestures[0]) {
-                //     console.log(estimatedGestures.gestures[0].name);
-                //     if (estimatedGestures.gestures[0].name == "point") {
-                //         var boxes = document.getElementsByClassName("box");
-                //         checkPointerFingerLocation(predictions, boxes);
-                //     }
-                // }
-
-                var boxes = document.getElementsByClassName("box");
-                checkPointerFingerLocation(boxes[0]);
-                checkPointerFingerLocation(boxes[1]);
-            }
-        }
+        var boxes = document.getElementsByClassName("box");
+        checkPointerFingerLocation(boxes[0], () => { boxes[0].style.backgroundColor = "yellowgreen" });
+        checkPointerFingerLocation(boxes[1], () => { boxes[1].style.backgroundColor = "purple" });
+        checkPointerFingerLocation(boxes[2], () => { boxes[2].style.backgroundColor = "brown" });
 
         canvasCtx.restore();
     }
@@ -214,7 +194,7 @@ function map(a, in_min, in_max, out_min, out_max) {
     return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function checkPointerFingerLocation(object) {
+function checkPointerFingerLocation(object, callback) {
     if (mpResults.leftHandLandmarks) {
         let x = map(mpResults.leftHandLandmarks[8].x, 0, 1, 0, canvasElement.clientWidth);
         let y = map(mpResults.leftHandLandmarks[8].y, 0, 1, 0, canvasElement.clientHeight);
@@ -233,7 +213,7 @@ function checkPointerFingerLocation(object) {
         // console.log(position);
 
         if (x > position.x1 && x < position.x2 && y > position.y1 && y < position.y2) {
-            object.style.backgroundColor = "yellowgreen";
+            callback();
         } else {
             object.style.backgroundColor = "aquamarine";
         }
