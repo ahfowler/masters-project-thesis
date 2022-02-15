@@ -1,7 +1,7 @@
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
-canvasElement.width = $(window).width();
-canvasElement.height = $(window).height();
+canvasElement.width = $("#example-application").width();
+canvasElement.height = $("#example-application").height();
 
 const canvasCtx = canvasElement.getContext('2d');
 
@@ -29,14 +29,26 @@ async function onResults(results) {
     if (results.rightHandLandmarks) {
         // console.log(results.rightHandLandmarks);
 
-        // drawingUtils.drawConnectors(
-        //     canvasCtx, results.rightHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-        //     { color: 'white' });
+        drawingUtils.drawConnectors(
+            canvasCtx, results.rightHandLandmarks, mpHolistic.HAND_CONNECTIONS,
+            { color: '#eeeeee' });
 
         drawingUtils.drawLandmarks(canvasCtx, results.rightHandLandmarks, {
-            color: 'white',
-            fillColor: 'rgb(0,217,231)',
-            lineWidth: 2,
+            color: (data) => {
+                if (data.index == 8) {
+                    return 'red';
+                } else {
+                    return '#eeeeee';
+                }
+            },
+            fillColor: (data) => {
+                if (data.index == 8) {
+                    return 'red';
+                } else {
+                    return '#eeeeee';
+                }
+            },
+            lineWidth: 3,
             radius: (data) => {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
@@ -69,7 +81,7 @@ async function onResults(results) {
             ]
             */
 
-            for (let i = 0; i < predictions.length; i++) {
+            for (var i = 0; i < predictions.length; i++) {
                 const keypoints = predictions[i].landmarks;
 
                 // Log hand keypoints.
@@ -80,7 +92,17 @@ async function onResults(results) {
 
                 // using a minimum match score of 8.5 (out of 10)
                 const estimatedGestures = GE.estimate(predictions[i].landmarks, 8.5);
-                // console.log(estimatedGestures.gestures[0]);
+
+                // if (estimatedGestures.gestures[0]) {
+                //     console.log(estimatedGestures.gestures[0].name);
+                //     if (estimatedGestures.gestures[0].name == "point") {
+                //         var boxes = document.getElementsByClassName("box");
+                //         checkPointerFingerLocation(predictions, boxes);
+                //     }
+                // }
+
+                var boxes = document.getElementsByClassName("box");
+                checkPointerFingerLocation(predictions, boxes);
             }
 
         }
@@ -89,29 +111,53 @@ async function onResults(results) {
     if (results.leftHandLandmarks) {
         // console.log(results.leftHandLandmarks);
 
-        // drawingUtils.drawConnectors(
-        //     canvasCtx, results.leftHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-        //     { color: 'white' });
+        drawingUtils.drawConnectors(
+            canvasCtx, results.leftHandLandmarks, mpHolistic.HAND_CONNECTIONS,
+            { color: '#eeeeee' });
 
         drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
-            color: 'white',
+            color: (data) => {
+                if (data.index == 8) {
+                    return 'red';
+                } else {
+                    return '#eeeeee';
+                }
+            },
             fillColor: (data) => {
                 if (data.index == 8) {
                     return 'red';
                 } else {
-                    return 'black';
+                    return '#eeeeee';
                 }
             },
-            lineWidth: 2,
+            lineWidth: 3,
             radius: (data) => {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
-        })
+        });
 
-        checkPointerFingerLocation(predictions);
+        if (predictions.length > 0) {
+            for (var i = 0; i < predictions.length; i++) {
+                const keypoints = predictions[i].landmarks;
+
+                // using a minimum match score of 8.5 (out of 10)
+                const estimatedGestures = GE.estimate(predictions[i].landmarks, 8.5);
+
+                // if (estimatedGestures.gestures[0]) {
+                //     console.log(estimatedGestures.gestures[0].name);
+                //     if (estimatedGestures.gestures[0].name == "point") {
+                //         var boxes = document.getElementsByClassName("box");
+                //         checkPointerFingerLocation(predictions, boxes);
+                //     }
+                // }
+
+                var boxes = document.getElementsByClassName("box");
+                checkPointerFingerLocation(predictions, boxes);
+            }
+        }
+
+        canvasCtx.restore();
     }
-
-    canvasCtx.restore();
 }
 
 const holistic = new Holistic({
@@ -143,46 +189,61 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
+const pointGesture = new fp.GestureDescription('point');
+pointGesture.addCurl(fp.Finger.Index, fp.FingerCurl.NoCurl, 1.0);
+pointGesture.addDirection(fp.Finger.Index, fp.FingerDirection.VerticalUp, 1.0);
+for (let finger of [fp.Finger.Thumb, fp.Finger.Middle, fp.Finger.Ring, fp.Finger.Pinky]) {
+    pointGesture.addCurl(finger, fp.FingerCurl.FullCurl);
+    pointGesture.addCurl(finger, fp.FingerCurl.HalfCurl);
+}
+
 // add "✌🏻" and "👍" as sample gestures
 const GE = new fp.GestureEstimator([
-    fp.Gestures.VictoryGesture,
-    fp.Gestures.ThumbsUpGesture
+    pointGesture,
 ]);
 
-function checkPointerFingerLocation(predictions) {
+function checkPointerFingerLocation(predictions, objects) {
     let objectTouched = false;
 
     if (predictions.length > 0) {
-        console.log(predictions[0].annotations.indexFinger);
-        const keypoints = predictions[0].annotations.indexFinger;
+        for (var i = 0; i < predictions.length; i++) {
+            if (!objectTouched) {
+                const keypoints = predictions[i].annotations.indexFinger;
 
-        var rect = document.getElementsByClassName("box")[0].getBoundingClientRect();
+                for (let j = 0; j < objects.length; j++) {
+                    var object = objects[j];
 
-        var position = {
-            x1: rect.x,
-            x2: rect.x + rect.width,
-            y1: rect.y,
-            y2: rect.y + rect.height
-        };
+                    var rect = object.getBoundingClientRect();
 
-        canvasCtx.fillStyle = "red";
-        canvasCtx.fillRect(position.x1, position.y1, rect.width, rect.height);
+                    var position = {
+                        x1: rect.x,
+                        x2: rect.x + rect.width,
+                        y1: rect.y,
+                        y2: rect.y + rect.height
+                    };
 
+                    // canvasCtx.fillStyle = "red";
+                    // canvasCtx.fillRect(position.x1, position.y1, rect.width, rect.height);
 
-        for (var i = 0; i < keypoints.length; i++) {
-            if (keypoints[i][0] >= position.x1 && keypoints[i][0] <= position.x2) {
-                if (keypoints[i][1] >= position.y1 && keypoints[i][1] <= position.y2) {
-                    objectTouched = true;
-                    console.log(keypoints[i]);
-                    break;
+                    if (keypoints[0][0] >= position.x1 && keypoints[0][0] <= position.x2) {
+                        if (keypoints[0][1] >= position.y1 && keypoints[0][1] <= position.y2) {
+                            objectTouched = true;
+                            console.log("object touched", keypoints[i]);
+                            break;
+                        }
+                    }
                 }
+
+            } else {
+                break;
             }
         }
     }
 
     if (objectTouched) {
-        document.getElementsByClassName("box")[0].style.backgroundColor = "teal";
+        object.style.backgroundColor = "teal";
     } else {
-        document.getElementsByClassName("box")[0].style.backgroundColor = "aquamarine";
+        object.style.backgroundColor = "aquamarine";
     }
 }
+
