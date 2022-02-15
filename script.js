@@ -109,9 +109,6 @@ async function onResults(results) {
                 //         checkPointerFingerLocation(predictions, boxes);
                 //     }
                 // }
-
-                var boxes = document.getElementsByClassName("box");
-                checkPointerFingerLocation(predictions, boxes[0]);
             }
 
         }
@@ -168,7 +165,8 @@ async function onResults(results) {
                 // }
 
                 var boxes = document.getElementsByClassName("box");
-                checkPointerFingerLocation(predictions, boxes[0]);
+                checkPointerFingerLocation(boxes[0]);
+                checkPointerFingerLocation(boxes[1]);
             }
         }
 
