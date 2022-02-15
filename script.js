@@ -1,5 +1,8 @@
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
+canvasElement.width = $(window).width();
+canvasElement.height = $(window).height();
+
 const canvasCtx = canvasElement.getContext('2d');
 
 const mpHolistic = window;
@@ -18,7 +21,7 @@ async function onResults(results) {
 
     // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain a
     // hand prediction from the MediaPipe graph.
-    predictions = await model.estimateHands(document.querySelector("video"), true);
+    predictions = await model.estimateHands(document.querySelector("video"), false);
 
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -96,7 +99,7 @@ async function onResults(results) {
                 if (data.index == 8) {
                     return 'red';
                 } else {
-                    return 'white';
+                    return 'black';
                 }
             },
             lineWidth: 2,
@@ -104,6 +107,8 @@ async function onResults(results) {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
         })
+
+        checkPointerFingerLocation(predictions);
     }
 
     canvasCtx.restore();
@@ -143,3 +148,41 @@ const GE = new fp.GestureEstimator([
     fp.Gestures.VictoryGesture,
     fp.Gestures.ThumbsUpGesture
 ]);
+
+function checkPointerFingerLocation(predictions) {
+    let objectTouched = false;
+
+    if (predictions.length > 0) {
+        console.log(predictions[0].annotations.indexFinger);
+        const keypoints = predictions[0].annotations.indexFinger;
+
+        var rect = document.getElementsByClassName("box")[0].getBoundingClientRect();
+
+        var position = {
+            x1: rect.x,
+            x2: rect.x + rect.width,
+            y1: rect.y,
+            y2: rect.y + rect.height
+        };
+
+        canvasCtx.fillStyle = "red";
+        canvasCtx.fillRect(position.x1, position.y1, rect.width, rect.height);
+
+
+        for (var i = 0; i < keypoints.length; i++) {
+            if (keypoints[i][0] >= position.x1 && keypoints[i][0] <= position.x2) {
+                if (keypoints[i][1] >= position.y1 && keypoints[i][1] <= position.y2) {
+                    objectTouched = true;
+                    console.log(keypoints[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (objectTouched) {
+        document.getElementsByClassName("box")[0].style.backgroundColor = "teal";
+    } else {
+        document.getElementsByClassName("box")[0].style.backgroundColor = "aquamarine";
+    }
+}
