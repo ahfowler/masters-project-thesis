@@ -10,6 +10,7 @@ const drawingUtils = window;
 
 var model;
 var predictions;
+var mpResults;
 
 var videoLoaded = false;
 
@@ -22,6 +23,7 @@ async function onResults(results) {
     // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain a
     // hand prediction from the MediaPipe graph.
     predictions = await model.estimateHands(document.querySelector("video"), false);
+    mpResults = results;
 
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -91,7 +93,14 @@ async function onResults(results) {
                 // }
 
                 // using a minimum match score of 8.5 (out of 10)
-                const estimatedGestures = GE.estimate(predictions[i].landmarks, 8.5);
+                const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
+
+                if (estimatedGestures.gestures[0]) {
+                    // console.log(estimatedGestures.poseData);
+                    document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
+                } else {
+                    document.getElementById("gesture-name").innerText = "...";
+                }
 
                 // if (estimatedGestures.gestures[0]) {
                 //     console.log(estimatedGestures.gestures[0].name);
@@ -102,7 +111,7 @@ async function onResults(results) {
                 // }
 
                 var boxes = document.getElementsByClassName("box");
-                checkPointerFingerLocation(predictions, boxes);
+                checkPointerFingerLocation(predictions, boxes[0]);
             }
 
         }
@@ -141,7 +150,14 @@ async function onResults(results) {
                 const keypoints = predictions[i].landmarks;
 
                 // using a minimum match score of 8.5 (out of 10)
-                const estimatedGestures = GE.estimate(predictions[i].landmarks, 8.5);
+                const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
+
+                if (estimatedGestures.gestures[0]) {
+                    // console.log(estimatedGestures.poseData);
+                    document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
+                } else {
+                    document.getElementById("gesture-name").innerText = "...";
+                }
 
                 // if (estimatedGestures.gestures[0]) {
                 //     console.log(estimatedGestures.gestures[0].name);
@@ -152,7 +168,7 @@ async function onResults(results) {
                 // }
 
                 var boxes = document.getElementsByClassName("box");
-                checkPointerFingerLocation(predictions, boxes);
+                checkPointerFingerLocation(predictions, boxes[0]);
             }
         }
 
@@ -189,61 +205,40 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
-const pointGesture = new fp.GestureDescription('point');
-pointGesture.addCurl(fp.Finger.Index, fp.FingerCurl.NoCurl, 1.0);
-pointGesture.addDirection(fp.Finger.Index, fp.FingerDirection.VerticalUp, 1.0);
-for (let finger of [fp.Finger.Thumb, fp.Finger.Middle, fp.Finger.Ring, fp.Finger.Pinky]) {
-    pointGesture.addCurl(finger, fp.FingerCurl.FullCurl);
-    pointGesture.addCurl(finger, fp.FingerCurl.HalfCurl);
-}
-
+fp.Gestures.ThumbsUpGesture.name = "thumbs up";
 // add "✌🏻" and "👍" as sample gestures
 const GE = new fp.GestureEstimator([
-    pointGesture,
+    fp.Gestures.VictoryGesture,
+    fp.Gestures.ThumbsUpGesture
 ]);
 
-function checkPointerFingerLocation(predictions, objects) {
-    let objectTouched = false;
+function map(a, in_min, in_max, out_min, out_max) {
+    return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
-    if (predictions.length > 0) {
-        for (var i = 0; i < predictions.length; i++) {
-            if (!objectTouched) {
-                const keypoints = predictions[i].annotations.indexFinger;
+function checkPointerFingerLocation(object) {
+    if (mpResults.leftHandLandmarks) {
+        let x = map(mpResults.leftHandLandmarks[8].x, 0, 1, 0, canvasElement.clientWidth);
+        let y = map(mpResults.leftHandLandmarks[8].y, 0, 1, 0, canvasElement.clientHeight);
 
-                for (let j = 0; j < objects.length; j++) {
-                    var object = objects[j];
+        // console.log(x, y);
 
-                    var rect = object.getBoundingClientRect();
+        let rect = object.getBoundingClientRect();
 
-                    var position = {
-                        x1: rect.x,
-                        x2: rect.x + rect.width,
-                        y1: rect.y,
-                        y2: rect.y + rect.height
-                    };
-
-                    // canvasCtx.fillStyle = "red";
-                    // canvasCtx.fillRect(position.x1, position.y1, rect.width, rect.height);
-
-                    if (keypoints[0][0] >= position.x1 && keypoints[0][0] <= position.x2) {
-                        if (keypoints[0][1] >= position.y1 && keypoints[0][1] <= position.y2) {
-                            objectTouched = true;
-                            console.log("object touched", keypoints[i]);
-                            break;
-                        }
-                    }
-                }
-
-            } else {
-                break;
-            }
+        var position = {
+            x1: rect.x,
+            x2: rect.x + rect.width,
+            y1: rect.y,
+            y2: rect.y + rect.height
         }
-    }
 
-    if (objectTouched) {
-        object.style.backgroundColor = "teal";
-    } else {
-        object.style.backgroundColor = "aquamarine";
+        // console.log(position);
+
+        if (x > position.x1 && x < position.x2 && y > position.y1 && y < position.y2) {
+            object.style.backgroundColor = "yellowgreen";
+        } else {
+            object.style.backgroundColor = "aquamarine";
+        }
     }
 }
 
