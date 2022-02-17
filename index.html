@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="utf-8">
+    <!-- Download JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-
+    <!-- Download MediaPipe's Holisitic Model and Support Tools -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
         crossorigin="anonymous"></script>
@@ -13,15 +14,21 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
 
+    <!-- Download TensorFlow's Handpose Models -->
     <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
     <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
     <script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
-
     <!-- use the WebGL backend (recommended) - you can alternatively use the WASM backend -->
     <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
-
     <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+
+    <!-- Download Fingerpose Gesture Recgnition Engine -->
     <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js"></script>
+
+    <!-- Download Tone.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/fabric@5.1.0-browser/dist/fabric.min.js"></script> -->
 
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -30,10 +37,12 @@
     <div class="container">
         <video class="input_video"></video>
         <div class="canvas-container">
-            <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
         </div>
         <div id="example-application">
-            <div>You are making the <span id="gesture-name">...</span> gesture!</div>
+            <div>Make a number with your hand! 
+                <br />
+                You are making the <span id="gesture-name">...</span> gesture!</div>
             <br />
             <div>Touch the box with your right pointer finger.</div>
             <br />
@@ -45,6 +54,7 @@
         </div>
     <script src="./gesturesLibrary.js"></script>
     <script src="./script.js"></script>
+    <script src="./interactionsLibrary.js"></script>
 </body>
 
 </html>

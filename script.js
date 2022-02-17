@@ -68,7 +68,7 @@ async function onResults(results) {
             const estimatedGestures = interactiveGestures.estimate(predictions[i].landmarks, 9.5);
 
             if (estimatedGestures.gestures[0]) {
-                console.log(estimatedGestures.gestures);
+                // console.log(estimatedGestures.gestures);
                 document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
                 break;
             } else {
@@ -126,15 +126,15 @@ async function onResults(results) {
 
         drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
             color: (data) => {
-                if (data.index == 8) {
-                    return 'red';
+                if (data.index == bodyPoints.leftIndexTip) {
+                    return landmarkColors.leftIndexTip;
                 } else {
                     return '#eeeeee';
                 }
             },
             fillColor: (data) => {
-                if (data.index == 8) {
-                    return 'red';
+                if (data.index == bodyPoints.leftIndexTip) {
+                    return landmarkColors.leftIndexTip;
                 } else {
                     return '#eeeeee';
                 }
@@ -146,9 +146,40 @@ async function onResults(results) {
         });
 
         var boxes = document.getElementsByClassName("box");
-        checkPointerFingerLocation(boxes[0], () => { boxes[0].style.backgroundColor = "yellowgreen" });
-        checkPointerFingerLocation(boxes[1], () => { boxes[1].style.backgroundColor = "purple" });
-        checkPointerFingerLocation(boxes[2], () => { boxes[2].style.backgroundColor = "brown" });
+        var boxColors = {
+            defaultColor: "aquamarine",
+            activeColor: "yellowgreen",
+            getDefaultColor: function () {
+                return this.defaultColor;
+            },
+            getActiveColor: function () {
+                return this.activeColor;
+            }
+        };
+        const synth = new Tone.Synth().toDestination();
+
+        userTouchesObject("leftIndexTip", boxes[0], () => {
+            boxes[0].style.backgroundColor = boxColors.getActiveColor();
+        }, () => {
+            boxes[0].style.backgroundColor = boxColors.getDefaultColor();
+        });
+
+        userTouchesObject("leftIndexTip", boxes[1], () => {
+            boxes[1].style.backgroundColor = boxColors.getActiveColor();
+        }, () => {
+            boxes[1].style.backgroundColor = boxColors.getDefaultColor();
+        });
+
+        userTouchesObject("leftIndexTip", boxes[2], () => {
+            boxes[2].style.backgroundColor = boxColors.getActiveColor();
+        }, () => {
+            boxes[2].style.backgroundColor = boxColors.getDefaultColor();
+        });
+
+        userClicksObject("leftIndexTip", boxes[0], () => {
+            synth.triggerAttackRelease("C4", "8n");
+            console.log("clicked!");
+        });
 
         canvasCtx.restore();
     }
@@ -182,34 +213,4 @@ const camera = new Camera(videoElement, {
 });
 videoElement.classList.add('selfie');
 camera.start();
-
-function map(a, in_min, in_max, out_min, out_max) {
-    return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-function checkPointerFingerLocation(object, callback) {
-    if (mpResults.leftHandLandmarks) {
-        let x = map(mpResults.leftHandLandmarks[8].x, 0, 1, 0, canvasElement.clientWidth);
-        let y = map(mpResults.leftHandLandmarks[8].y, 0, 1, 0, canvasElement.clientHeight);
-
-        // console.log(x, y);
-
-        let objectDimensions = object.getBoundingClientRect();
-
-        var position = {
-            x1: objectDimensions.x,
-            x2: objectDimensions.x + objectDimensions.width,
-            y1: objectDimensions.y,
-            y2: objectDimensions.y + objectDimensions.height
-        }
-
-        // console.log(position);
-
-        if (x > position.x1 && x < position.x2 && y > position.y1 && y < position.y2) {
-            callback();
-        } else {
-            object.style.backgroundColor = "aquamarine";
-        }
-    }
-}
 
