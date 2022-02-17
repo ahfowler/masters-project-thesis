@@ -65,10 +65,10 @@ async function onResults(results) {
             // }
 
             // using a minimum match score of 8.5 (out of 10)
-            const estimatedGestures = GE.estimate(predictions[i].landmarks, 9.5);
+            const estimatedGestures = interactiveGestures.estimate(predictions[i].landmarks, 9.5);
 
             if (estimatedGestures.gestures[0]) {
-                // console.log(estimatedGestures.poseData);
+                console.log(estimatedGestures.gestures);
                 document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
                 break;
             } else {
@@ -183,13 +183,6 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
-fp.Gestures.ThumbsUpGesture.name = "thumbs up";
-// add "✌🏻" and "👍" as sample gestures
-const GE = new fp.GestureEstimator([
-    fp.Gestures.VictoryGesture,
-    fp.Gestures.ThumbsUpGesture
-]);
-
 function map(a, in_min, in_max, out_min, out_max) {
     return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -201,13 +194,13 @@ function checkPointerFingerLocation(object, callback) {
 
         // console.log(x, y);
 
-        let rect = object.getBoundingClientRect();
+        let objectDimensions = object.getBoundingClientRect();
 
         var position = {
-            x1: rect.x,
-            x2: rect.x + rect.width,
-            y1: rect.y,
-            y2: rect.y + rect.height
+            x1: objectDimensions.x,
+            x2: objectDimensions.x + objectDimensions.width,
+            y1: objectDimensions.y,
+            y2: objectDimensions.y + objectDimensions.height
         }
 
         // console.log(position);
