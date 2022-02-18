@@ -56,15 +56,6 @@ async function onResults(results) {
         */
 
         for (var i = 0; i < predictions.length; i++) {
-            const keypoints = predictions[i].landmarks;
-
-            // Log hand keypoints.
-            // for (let i = 0; i < keypoints.length; i++) {
-            //     const [x, y, z] = keypoints[i];
-            //     console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-            // }
-
-            // using a minimum match score of 8.5 (out of 10)
             const estimatedGestures = interactiveGestures.estimate(predictions[i].landmarks, 9.5);
 
             if (estimatedGestures.gestures[0]) {
@@ -73,7 +64,6 @@ async function onResults(results) {
                 break;
             } else {
                 continue;
-                document.getElementById("gesture-name").innerText = "...";
             }
 
             // if (estimatedGestures.gestures[0]) {
@@ -126,14 +116,14 @@ async function onResults(results) {
 
         drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
             color: (data) => {
-                if (data.index == bodyPoints.leftIndexTip) {
+                if (data.index == landmarkPoints.leftIndexTip) {
                     return landmarkColors.leftIndexTip;
                 } else {
                     return '#eeeeee';
                 }
             },
             fillColor: (data) => {
-                if (data.index == bodyPoints.leftIndexTip) {
+                if (data.index == landmarkPoints.leftIndexTip) {
                     return landmarkColors.leftIndexTip;
                 } else {
                     return '#eeeeee';
@@ -156,29 +146,23 @@ async function onResults(results) {
                 return this.activeColor;
             }
         };
-        const synth = new Tone.Synth().toDestination();
-
-        userTouchesObject("leftIndexTip", boxes[0], () => {
+    
+        userTouchesObject(["leftIndexTip"], boxes[0], () => {
             boxes[0].style.backgroundColor = boxColors.getActiveColor();
         }, () => {
             boxes[0].style.backgroundColor = boxColors.getDefaultColor();
         });
 
-        userTouchesObject("leftIndexTip", boxes[1], () => {
-            boxes[1].style.backgroundColor = boxColors.getActiveColor();
-        }, () => {
-            boxes[1].style.backgroundColor = boxColors.getDefaultColor();
+        userClicksObject(["leftIndexTip"], boxes[1], () => {
+            console.log("clicked!");
         });
 
-        userTouchesObject("leftIndexTip", boxes[2], () => {
+        userDragsAndDropsObject(boxes[2], () => {
+            boxes[2].style.backgroundColor = boxColors.getActiveColor();
+        }, () => {
             boxes[2].style.backgroundColor = boxColors.getActiveColor();
         }, () => {
             boxes[2].style.backgroundColor = boxColors.getDefaultColor();
-        });
-
-        userClicksObject("leftIndexTip", boxes[0], () => {
-            synth.triggerAttackRelease("C4", "8n");
-            console.log("clicked!");
         });
 
         canvasCtx.restore();

@@ -214,6 +214,11 @@ const interactiveGestures = new fp.GestureEstimator([
     openHandDescription
 ]);
 
+const dragDropGestures = new fp.GestureEstimator([
+    fistDescription,
+    openHandDescription
+]);
+
 const numberGestures = new fp.GestureEstimator([
     zeroDescription,
     oneDescription,
@@ -231,3 +236,32 @@ const miscGestures = new fp.GestureEstimator([
     fistDescription,
     openHandDescription,
 ]);
+
+// Gesture Functions
+function userOpensHand() {
+    if (predictions.length > 0) { // Check both hands...
+        const estimatedGestures = dragDropGestures.estimate(predictions[0].landmarks, 9.5);
+
+        for (var i = 0; i < estimatedGestures.gestures.length; i++) {
+            if (estimatedGestures.gestures[i] && estimatedGestures.gestures[i].name == "open hand") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function userClosesHand() {
+    if (predictions.length > 0) { // Check both hands...
+        const estimatedGestures = dragDropGestures.estimate(predictions[0].landmarks, 9.5);
+
+        for (var i = 0; i < estimatedGestures.gestures.length; i++) {
+            if (estimatedGestures.gestures[i] && estimatedGestures.gestures[i].name == "fist") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
