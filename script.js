@@ -56,11 +56,11 @@ async function onResults(results) {
         */
 
         for (var i = 0; i < predictions.length; i++) {
-            const estimatedGestures = interactiveGestures.estimate(predictions[i].landmarks, 9.5);
+            const estimatedGestures = numberGestures.estimate(predictions[i].landmarks, 9.5);
 
             if (estimatedGestures.gestures[0]) {
                 // console.log(estimatedGestures.gestures);
-                document.getElementById("gesture-name").innerText = estimatedGestures.gestures[0].name;
+                document.getElementById("gesture-name").innerText = numberGestures.gestures[0].name;
                 break;
             } else {
                 continue;
@@ -136,33 +136,23 @@ async function onResults(results) {
         });
 
         var boxes = document.getElementsByClassName("box");
-        var boxColors = {
-            defaultColor: "aquamarine",
-            activeColor: "yellowgreen",
-            getDefaultColor: function () {
-                return this.defaultColor;
-            },
-            getActiveColor: function () {
-                return this.activeColor;
-            }
-        };
     
         userTouchesObject(["leftIndexTip"], boxes[0], () => {
-            boxes[0].style.backgroundColor = boxColors.getActiveColor();
+            designEditGameMechanism.changeStyle(boxes[0], {backgroundColor: "yellowgreen", text: "you're touching me!"});
         }, () => {
-            boxes[0].style.backgroundColor = boxColors.getDefaultColor();
+            designEditGameMechanism.changeStyle(boxes[0], {backgroundColor: "aquamarine", text: "touch me with your pointer finger"});
         });
 
         userClicksObject(["leftIndexTip"], boxes[1], () => {
-            console.log("clicked!");
+            designEditGameMechanism.changeStyle(boxes[1], {backgroundColor: "yellowgreen", text: "you clicked me!"});
         });
 
         userDragsAndDropsObject(boxes[2], () => {
-            boxes[2].style.backgroundColor = boxColors.getActiveColor();
+            designEditGameMechanism.changeStyle(boxes[2], {backgroundColor: "yellowgreen", text: "you're picked me up!"});
         }, () => {
-            boxes[2].style.backgroundColor = boxColors.getActiveColor();
+            designEditGameMechanism.changeStyle(boxes[2], {text: "you're dragging me!"});
         }, () => {
-            boxes[2].style.backgroundColor = boxColors.getDefaultColor();
+            designEditGameMechanism.changeStyle(boxes[2], {backgroundColor: "aquamarine", text: "you dropped me!"});
         });
 
         canvasCtx.restore();
