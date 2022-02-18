@@ -28,54 +28,7 @@ async function onResults(results) {
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    if (predictions.length > 0) {
-        /*
-        `predictions` is an array of objects describing each detected hand, for example:
-        [
-          {
-            handInViewConfidence: 1, // The probability of a hand being present.
-            boundingBox: { // The bounding box surrounding the hand.
-              topLeft: [162.91, -17.42],
-              bottomRight: [548.56, 368.23],
-            },
-            landmarks: [ // The 3D coordinates of each hand landmark.
-              [472.52, 298.59, 0.00],
-              [412.80, 315.64, -6.18],
-              ...
-            ],
-            annotations: { // Semantic groupings of the `landmarks` coordinates.
-              thumb: [
-                [412.80, 315.64, -6.18]
-                [350.02, 298.38, -7.14],
-                ...
-              ],
-              ...
-            }
-          }
-        ]
-        */
-
-        for (var i = 0; i < predictions.length; i++) {
-            const estimatedGestures = numberGestures.estimate(predictions[i].landmarks, 9.5);
-
-            if (estimatedGestures.gestures[0]) {
-                // console.log(estimatedGestures.gestures);
-                document.getElementById("gesture-name").innerText = numberGestures.gestures[0].name;
-                break;
-            } else {
-                continue;
-            }
-
-            // if (estimatedGestures.gestures[0]) {
-            //     console.log(estimatedGestures.gestures[0].name);
-            //     if (estimatedGestures.gestures[0].name == "point") {
-            //         var boxes = document.getElementsByClassName("box");
-            //         checkPointerFingerLocation(predictions, boxes);
-            //     }
-            // }
-        }
-    }
-
+    document.getElementById("gesture-name").innerText = getUserNumberGesture();
 
     if (results.rightHandLandmarks) {
         // console.log(results.rightHandLandmarks);
@@ -86,18 +39,10 @@ async function onResults(results) {
 
         drawingUtils.drawLandmarks(canvasCtx, results.rightHandLandmarks, {
             color: (data) => {
-                if (data.index == 8) {
-                    return 'red';
-                } else {
-                    return '#eeeeee';
-                }
+                return landmarkStyles[landmarkNames[data.index]].color;
             },
             fillColor: (data) => {
-                if (data.index == 8) {
-                    return 'red';
-                } else {
-                    return '#eeeeee';
-                }
+                return landmarkStyles[landmarkNames[data.index]].fillColor;
             },
             lineWidth: 3,
             radius: (data) => {
@@ -105,7 +50,6 @@ async function onResults(results) {
             }
         });
     }
-
 
     if (results.leftHandLandmarks) {
         // console.log(results.leftHandLandmarks);
@@ -116,47 +60,39 @@ async function onResults(results) {
 
         drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
             color: (data) => {
-                if (data.index == landmarkPoints.leftIndexTip) {
-                    return landmarkColors.leftIndexTip;
-                } else {
-                    return '#eeeeee';
-                }
+                return landmarkStyles[landmarkNames[data.index]].color;
             },
             fillColor: (data) => {
-                if (data.index == landmarkPoints.leftIndexTip) {
-                    return landmarkColors.leftIndexTip;
-                } else {
-                    return '#eeeeee';
-                }
+                return landmarkStyles[landmarkNames[data.index]].fillColor;
             },
             lineWidth: 3,
             radius: (data) => {
                 return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
             }
         });
-
-        var boxes = document.getElementsByClassName("box");
-    
-        userTouchesObject(["leftIndexTip"], boxes[0], () => {
-            designEditGameMechanism.changeStyle(boxes[0], {backgroundColor: "yellowgreen", text: "you're touching me!"});
-        }, () => {
-            designEditGameMechanism.changeStyle(boxes[0], {backgroundColor: "aquamarine", text: "touch me with your pointer finger"});
-        });
-
-        userClicksObject(["leftIndexTip"], boxes[1], () => {
-            designEditGameMechanism.changeStyle(boxes[1], {backgroundColor: "yellowgreen", text: "you clicked me!"});
-        });
-
-        userDragsAndDropsObject(boxes[2], () => {
-            designEditGameMechanism.changeStyle(boxes[2], {backgroundColor: "yellowgreen", text: "you're picked me up!"});
-        }, () => {
-            designEditGameMechanism.changeStyle(boxes[2], {text: "you're dragging me!"});
-        }, () => {
-            designEditGameMechanism.changeStyle(boxes[2], {backgroundColor: "aquamarine", text: "you dropped me!"});
-        });
-
-        canvasCtx.restore();
     }
+
+    var boxes = document.getElementsByClassName("box");
+
+    userTouchesObject(landmarkAreas.indexTips, boxes[0], () => {
+        designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "yellowgreen", text: "you're touching me!" });
+    }, () => {
+        designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "aquamarine", text: "touch me with your pointer finger" });
+    });
+
+    userClicksObject(landmarkAreas.indexTips, boxes[1], () => {
+        designEditGameMechanism.changeStyle(boxes[1], { backgroundColor: "yellowgreen", text: "you clicked me!" });
+    }, "drawOuterCircle");
+
+    userDragsAndDropsObject(boxes[2], () => {
+        designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "yellowgreen", text: "you're picked me up!" });
+    }, () => {
+        designEditGameMechanism.changeStyle(boxes[2], { text: "you're dragging me!" });
+    }, () => {
+        designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "aquamarine", text: "you dropped me!" });
+    });
+
+    canvasCtx.restore();
 }
 
 const holistic = new Holistic({
