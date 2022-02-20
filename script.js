@@ -22,17 +22,11 @@ let whiteKeyNotes = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4"];
 let whiteNotePlaying = [false, false, false, false, false, false, false, false, false];
 let whiteKeys = document.getElementById("white-keys").children;
 
-let blackKeyNotes = [null, "C#3", "D#3", null, "F#3", "G#3", "A#3", null, "C#4", null];
-let blackNotePlaying = [false, false, false, false, false, false, false, false, false, false];
+let blackKeyNotes = [null, "C#3", "D#3", null, "F#3", "G#3", "A#3", null, "C#4", null, null];
+let blackNotePlaying = [false, false, false, false, false, false, false, false, false, false, false];
 let blackKeys = document.getElementById("black-keys").children;
 
-for (var i = 0; i < whiteKeys.length; i++) {
-    let synth = new Tone.Synth().toMaster();
-    synth.portamento = 5;
-    synths.push(synth);
-}
-
-for (var i = 0; i < blackKeys.length; i++) {
+for (var i = 0; i < (whiteKeys.length + blackKeys.length); i++) {
     let synth = new Tone.Synth().toMaster();
     synth.portamento = 5;
     synths.push(synth);
@@ -137,17 +131,18 @@ async function onResults(results) {
 
     for (var i = 0; i < blackKeys.length; i++) {
         let pianoKey = blackKeys[i];
-
-        userHoversObject(landmarkAreas.fingerTips, pianoKey, () => {
-            if (!blackNotePlaying[i]) {
-                blackNotePlaying[i] = true;
-                synths[i].triggerAttackRelease(blackKeyNotes[i], "2n");
-                pianoKey.style.backgroundColor = "#272727";
-            }
-        }, () => {
-            blackNotePlaying[i] = false;
-            pianoKey.style.backgroundColor = "#333333";
-        });
+        if (!pianoKey.classList.contains("invisible")) {
+            userHoversObject(landmarkAreas.fingerTips, pianoKey, () => {
+                if (!blackNotePlaying[i]) {
+                    blackNotePlaying[i] = true;
+                    synths[10 + i].triggerAttackRelease(blackKeyNotes[i], "2n");
+                    pianoKey.style.backgroundColor = "#272727";
+                }
+            }, () => {
+                blackNotePlaying[i] = false;
+                pianoKey.style.backgroundColor = "#333333";
+            });
+        }
 
     }
 

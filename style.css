@@ -123,6 +123,7 @@ body {
   justify-content: center;
 
   width: 100%;
+  margin-top: 30px;
 
   transition: all 3s linear;
 }
@@ -144,7 +145,7 @@ body {
   width: 80%;
   /* height: 100vh; */
 
-  margin-top: 50px;
+  margin-top: 25px;
   margin-bottom: 50px;
 }
 
@@ -160,17 +161,12 @@ body {
   width: 100%;
 }
 
-#example-application > #demo > #hover-interaction-boxes > #white-keys {
-  min-width: 900px;
-}
-
 #example-application > #demo >  #hover-interaction-boxes > #black-keys {
-  min-width: 925px;
-  left: 75px;
+  left: 56.25px;
 }
 
 #example-application > #demo > .box-collection > #white-keys > .key {
-  width: 100px;
+  width: 75px;
   height: 250px;
   border-radius: 1px;
   background-color: #eeeeee;
@@ -190,7 +186,7 @@ body {
 }
 
 #example-application > #demo > .box-collection > #black-keys > .key {
-  min-width: 50px;
+  min-width: 37.5px;
   height: 125px;
   border-radius: 1px;
   background-color: #333333;
@@ -198,7 +194,7 @@ body {
 }
 
 #example-application > #demo > .box-collection > #black-keys > .key {
-  margin: 0 50px 0 0;
+  margin: 0 37.5px 0 0;
 }
 
 #example-application > #demo > .box-collection > #black-keys > .invisible {
