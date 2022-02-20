@@ -237,6 +237,14 @@ const miscGestures = new fp.GestureEstimator([
     openHandDescription,
 ]);
 
+const demoGestures = new fp.GestureEstimator([
+    pointDescription,
+    fistDescription,
+    thumbsUpDescription,
+    thumbsDownDescription,
+    twoDescription,
+]);
+
 // Gesture Functions
 function userOpensHand() {
     if (predictions.length > 0) { // Check both hands...
@@ -269,6 +277,18 @@ function userClosesHand() {
 function getUserNumberGesture() {
     if (predictions.length > 0) { // Check both hands...
         const estimatedGestures = numberGestures.estimate(predictions[0].landmarks, 9.5);
+
+        if (estimatedGestures.gestures[0]) {
+            return estimatedGestures.gestures[0].name;
+        }
+    }
+
+    return "";
+}
+
+function getDemoGesture() {
+    if (predictions.length > 0) { // Check both hands...
+        const estimatedGestures = demoGestures.estimate(predictions[0].landmarks, 8.5);
 
         if (estimatedGestures.gestures[0]) {
             return estimatedGestures.gestures[0].name;

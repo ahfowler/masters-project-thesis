@@ -63,14 +63,14 @@ const landmarkPoints = {
 
 const landmarkStyles = {
     leftIndexTip: {
-        color: "red",
-        fillColor: "red",
+        color: "#EEEEEE",
+        fillColor: "#EEEEEE",
         outerRadius: 0.0,
         continueGrowing: true
     },
     rightIndexTip: {
-        color: "red",
-        fillColor: "red",
+        color: "#EEEEEE",
+        fillColor: "#EEEEEE",
         outerRadius: 0.0,
         continueGrowing: true
     },
@@ -124,8 +124,8 @@ const landmarkStyles = {
         continueGrowing: true
     },
     indexTip: {
-        color: "red",
-        fillColor: "red",
+        color: "#EEEEEE",
+        fillColor: "#EEEEEE",
         outerRadius: 0.0,
         continueGrowing: true
     },
@@ -486,7 +486,6 @@ function moveObject(object, bodyPoints) {
     var objectHeight = objectDimensions.height / 2;
 
     object.style.position = "absolute";
-    object.style.left = (x - objectWidth) + "px";
-    object.style.top = (y - objectHeight) + "px";
-
+    object.style.left = (x - (objectWidth + 150)) + "px";
+    // object.style.top = (y - objectHeight) + "px";
 }

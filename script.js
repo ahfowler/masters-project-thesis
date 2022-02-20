@@ -32,11 +32,15 @@ for (var i = 0; i < (whiteKeys.length + blackKeys.length); i++) {
     synths.push(synth);
 }
 
+let targetBox = document.getElementById("box");
+let gestureBoxes = document.getElementsByClassName("gesture-box");
+
 async function onResults(results) {
     if (!videoLoaded) {
         model = await handpose.load();
         videoLoaded = true;
         document.getElementById("demo").style.opacity = 1;
+        document.getElementById("loading-text").innerHTML = "Wave your hands!";
     }
 
     // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain a
@@ -46,8 +50,6 @@ async function onResults(results) {
 
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-    // document.getElementById("gesture-name").innerText = getUserNumberGesture();
 
     if (results.rightHandLandmarks) {
         // console.log(results.rightHandLandmarks);
@@ -91,28 +93,6 @@ async function onResults(results) {
         });
     }
 
-    // var boxes = document.getElementsByClassName("box");
-
-    // userHoversObject(landmarkAreas.indexTips, boxes[0], () => {
-    //     designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "yellowgreen", text: "you're touching me!" });
-    // }, () => {
-    //     designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "aquamarine", text: "touch me with your pointer finger" });
-    // });
-
-    // userClicksObject(landmarkAreas.indexTips, boxes[1], () => {
-    //     designEditGameMechanism.changeStyle(boxes[1], { backgroundColor: "yellowgreen", text: "you clicked me!" });
-    //     // setTimeout(getObjectByUID(boxes[1].uid).selected = false, 5000);
-    // }, "drawOuterCircle");
-
-    // userDragsAndDropsObject(boxes[2], () => {
-    //     designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "yellowgreen", text: "you're picked me up!" });
-    // }, () => {
-    //     moveObject(boxes[2], landmarkAreas.palm);
-    //     designEditGameMechanism.changeStyle(boxes[2], { text: "you're dragging me!" });
-    // }, () => {
-    //     designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "aquamarine", text: "you dropped me!" });
-    // });
-
     for (var i = 0; i < whiteKeys.length; i++) {
         let pianoKey = whiteKeys[i];
 
@@ -146,6 +126,46 @@ async function onResults(results) {
 
     }
 
+    userDragsAndDropsObject(targetBox, () => {
+        targetBox.style.backgroundColor = "#e9c46a";
+    }, () => {
+        moveObject(targetBox, landmarkAreas.palm);
+        targetBox.style.backgroundColor = "#e9c46a";
+    }, () => {
+        targetBox.style.backgroundColor = "#3c6c8a";
+    });
+
+    let currentGesture = getUserNumberGesture();
+    let gestureIndex = 0;
+    switch (currentGesture) {
+        case "number zero":
+            gestureIndex = 0;
+            break;
+        case "number one":
+            gestureIndex = 1;
+            break;
+        case "number two":
+            gestureIndex = 2;
+            break;
+        case "number three":
+            gestureIndex = 3;
+            break;
+        case "number four":
+            gestureIndex = 4;
+            break;
+        case "number five":
+            gestureIndex = 5;
+            break;
+    }
+
+    document.getElementById("gesture-name").innerHTML = currentGesture;
+    gestureBoxes[gestureIndex].style.backgroundColor = "#36536d50";
+
+    for (var i = 0; i < gestureBoxes.length; i++) {
+        if (i != gestureIndex) {
+            gestureBoxes[i].style.backgroundColor = "transparent";
+        }
+    }
 
     canvasCtx.restore();
 }

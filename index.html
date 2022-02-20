@@ -44,12 +44,17 @@
             <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
         </div>
         <div id="example-application">
-            <h1>Welcome to Gamesture.js</h1>
-            <p>A lightweight Javascript framework for embodied game development with a focus in educational
-                applications.</p>
+            <div id="landing-page">
+                <h1>Gamesture.js</h1>
+                <p>A lightweight Javascript framework for embodied game development with a focus in educational
+                    applications.</p>
+                <br />
+                <p id="loading-text">Loading...</p>
+            </div>
 
-            <div id="demo" style="opacity: 1;">
-                <h2>Try playing the piano with your finger tips.</h2>
+            <div id="demo" style="opacity: 0;">
+                <h2>Touch elements on the DOM with any part of your body.</h2>
+                <p>Try playing the piano with your fingertips.</p>
                 <div id="hover-interaction-boxes" class="box-collection">
                     <div id="white-keys">
                         <div class="key">
@@ -94,6 +99,45 @@
                         <div class="key invisible"></div>
                     </div>
                 </div>
+
+                <br />
+
+                <h2>Manipulate elements on the DOM with any gesture.</h2>
+                <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target area.</p>
+                <div id="drag-interaction-boxes" class="box-collection">
+                    <div class="target-box">Begin</div>
+                    <div class="target-box">End</div>
+                    <div id="box"></div>
+                </div>
+
+                <br />
+
+                <h2>Identify any gesture.</h2>
+                <p>Try making any of the gestures below and see it light up.</p>
+                <p>You made the <span id="gesture-name"></span> gesture!</p>
+                <div id="gesture-interaction-boxes" class="box-collection">
+                    <div class="gesture-box">
+                        Zero
+                    </div>
+                    <div class="gesture-box">
+                        One
+                    </div>
+                    <div class="gesture-box">
+                        Two
+                    </div>
+                    <div class="gesture-box">
+
+                        Three
+                    </div>
+                    <div class="gesture-box">
+                        Four
+                    </div>
+                    <div class="gesture-box">
+                        Five
+                    </div>
+                </div>
+
+
             </div>
         </div>
         <script src="./initialize.js"></script>
@@ -103,6 +147,7 @@
         <script src="./actionPointsLibrary.js"></script>
         <script src="./captureEliminateLibrary.js"></script>
         <script src="./script.js"></script>
+        <script src="./confetti.js"></script>
 </body>
 
 </html>
