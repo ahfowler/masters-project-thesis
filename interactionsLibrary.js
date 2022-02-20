@@ -5,6 +5,7 @@ const landmarkAreas = {
     // ringFinger: [13, 14, 15, 16],
     // pinky: [17, 18, 19, 20],
     // palm: [0, 5, 9, 13, 17]
+    fingerTips: ["indexTip", "middleTip", "ringTip", "pinkyTip", "thumbTip"],
     indexTips: ["leftIndexTip", "rightIndexTip"],
     palm: ["bottomPalm", "bottomIndex", "bottomMiddle", "bottomRing", "bottomPinky"],
 }
@@ -220,6 +221,16 @@ function userHoversObject(bodyPoints, object, trueCallback, falseCallback) {
             let x, y;
 
             if ((bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky") && (mpResults.leftHandLandmarks || mpResults.rightHandLandmarks)) {
+                if (mpResults.leftHandLandmarks) {
+                    x = map(mpResults.leftHandLandmarks[landmarkPoint].x, 0, 1, 0, canvasElement.clientWidth);
+                    y = map(mpResults.leftHandLandmarks[landmarkPoint].y, 0, 1, 0, canvasElement.clientHeight);
+                    radius = drawingUtils.lerp(mpResults.leftHandLandmarks[landmarkPoint].z, -0.15, .1, 10, 1);
+                } else {
+                    x = map(mpResults.rightHandLandmarks[landmarkPoint].x, 0, 1, 0, canvasElement.clientWidth);
+                    y = map(mpResults.rightHandLandmarks[landmarkPoint].y, 0, 1, 0, canvasElement.clientHeight);
+                    radius = drawingUtils.lerp(mpResults.rightHandLandmarks[landmarkPoint].z, -0.15, .1, 10, 1);
+                }
+            } else if ((bodyPoint == "indexTip" || bodyPoint == "ringTip" || bodyPoint == "middleTip" || bodyPoint == "pinkyTip" || bodyPoint == "thumbTip") && (mpResults.leftHandLandmarks || mpResults.rightHandLandmarks)) {
                 if (mpResults.leftHandLandmarks) {
                     x = map(mpResults.leftHandLandmarks[landmarkPoint].x, 0, 1, 0, canvasElement.clientWidth);
                     y = map(mpResults.leftHandLandmarks[landmarkPoint].y, 0, 1, 0, canvasElement.clientHeight);

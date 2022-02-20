@@ -1,94 +1,206 @@
-  body {
-    bottom: 0;
-    font-family: 'Titillium Web', sans-serif;
-    margin: 0;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-  }
+/* #101c2a
+#49a0c5
+#4286a7
+#3c6c8a
+#36536d */
+
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+  position: absolute;
+  top: 0;
+  bottom: 0;  
+  left: 0;
+  right: 0;
+
+  background-color: #101c2a;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+
+  /* overflow: hidden; */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.input_video {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.input_video.selfie {
+  transform: scale(-1, 1);
+}
+
+.canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+  width: 100%;
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  z-index: 1;
+}
+
+.output_canvas {
+  display: block;
+
+  max-width: 100%;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  z-index: 1;
+
+  background-color: transparent;
+}
+
+/* Application Styles */
+
+#example-application {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  /* position: relative;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0; */
+
+  background-color: #101c2a;
+  color: #49a0c5;
+  font-family: 'Inconsolata', monospace;
+}
+
+#example-application > h1 {
+  color: #49a0c5;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 30px;
+  font-weight: 300;
+  margin-block-start: 0.2em;
+  margin-block-end: 0.2em;
+}
+
+#example-application > p {
+  color: #49a0c5;
+  font-family: 'Inconsolata', monospace;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+#example-application > #demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  transition: all 3s linear;
+}
+
+#example-application > #demo > h2 {
+  color: #49a0c5;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  margin-block-start: 0.2em;
+  margin-block-end: 0.2em;
+}
+
+#example-application > #demo > .box-collection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 80%;
+  /* height: 100vh; */
+
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+#example-application > #demo > #hover-interaction-boxes {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+#example-application > #demo > #hover-interaction-boxes > * {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  width: 100%;
+}
+
+#example-application > #demo > #hover-interaction-boxes > #white-keys {
+  min-width: 900px;
+}
+
+#example-application > #demo >  #hover-interaction-boxes > #black-keys {
+  min-width: 925px;
+  left: 75px;
+}
+
+#example-application > #demo > .box-collection > #white-keys > .key {
+  width: 100px;
+  height: 250px;
+  border-radius: 1px;
+  background-color: #eeeeee;
+  border: #333333 solid 1px;
   
-  .container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
 
-    width: 100%;
-    height: 100%;
+#example-application > #demo > .box-collection > * > .key > p {
+  color: #aaaaaa;
+  text-align: center;
+  font-family: 'Inconsolata', monospace;
+  font-size: 15px;
+  font-weight: 300;
+}
 
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow: hidden;
-  }
-  
-  .input_video {
-      display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
+#example-application > #demo > .box-collection > #black-keys > .key {
+  min-width: 50px;
+  height: 125px;
+  border-radius: 1px;
+  background-color: #333333;
+  border: #333333 solid 1px;
+}
 
-  .input_video.selfie {
-    transform: scale(-1, 1);
-  }
-  
-  .canvas-container {
-    display: flex;
-    height: 100%;
-    width: 100%;
+#example-application > #demo > .box-collection > #black-keys > .key {
+  margin: 0 50px 0 0;
+}
 
-    z-index: 5;
-
-    position: relative;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-  }
-  
-  .output_canvas {
-    max-width: 100%;
-    display: block;
-    position: relative;
-    left: 0;
-    top: 0;
-    z-index: 5;
-    background-color: transparent;
-  }
-
-  #example-application {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    z-index: 4;
-    background-color: #FFFFFF;
-  }
-
-  #example-application > div > .box {
-      width: 150px;
-      height: 150px;
-      margin: 15px;
-      padding: 10px;
-      border-radius: 10px;
-      text-align: center;
-      background-color: aquamarine;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-  }
-  
+#example-application > #demo > .box-collection > #black-keys > .invisible {
+  opacity: 0;
+}

@@ -44,17 +44,56 @@
             <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
         </div>
         <div id="example-application">
-            <div>Make a number with your hand!
-                <br />
-                You are making the <span id="gesture-name">...</span> gesture!
-            </div>
-            <br />
-            <div>Interact with the boxes.</div>
-            <br />
-            <div style="display: flex; justify-content: center; width: 100%; height: 50%">
-                <div class="box" style="height: 200px;">touch me with your pointer finger</div>
-                <div class="box">click me by holding your pointer finger on me</div>
-                <div class="box" style="height: 200px; width: 200px;">grab me with your entire hand</div>
+            <h1>Welcome to Gamesture.js</h1>
+            <p>A lightweight Javascript framework for embodied game development with a focus in educational
+                applications.</p>
+
+            <div id="demo" style="opacity: 0;">
+                <h2>Try playing the piano with your finger tips.</h2>
+                <div id="hover-interaction-boxes" class="box-collection">
+                    <div id="white-keys">
+                        <div class="key">
+                            <p>C</p>
+                        </div>
+                        <div class="key">
+                            <p>D</p>
+                        </div>
+                        <div class="key">
+                            <p>E</p>
+                        </div>
+                        <div class="key">
+                            <p>F</p>
+                        </div>
+                        <div class="key">
+                            <p>G</p>
+                        </div>
+                        <div class="key">
+                            <p>A</p>
+                        </div>
+                        <div class="key">
+                            <p>B</p>
+                        </div>
+                        <div class="key">
+                            <p>C</p>
+                        </div>
+                        <div class="key">
+                            <p>D</p>
+                        </div>
+                    </div>
+                    <div id="black-keys">
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key invisible"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <script src="./initialize.js"></script>
