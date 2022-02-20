@@ -206,7 +206,7 @@ function map(a, in_min, in_max, out_min, out_max) {
     return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function userTouchesObject(bodyPoints, object, trueCallback, falseCallback) {
+function userHoversObject(bodyPoints, object, trueCallback, falseCallback) {
     // Get object's Object class.
     const objectClass = getObjectByUID(object.uid);
 
@@ -240,6 +240,9 @@ function userTouchesObject(bodyPoints, object, trueCallback, falseCallback) {
             }
 
             // console.log(x, y);
+
+            cursor.x = x;
+            cursor.y = y;
 
             let objectDimensions = object.getBoundingClientRect();
 
@@ -283,7 +286,7 @@ function userClicksObject(bodyPoints, object, trueCallback, drawingAnimation) {
             let x, y;
             let leftOrRight = false;
 
-            if (userTouchesObject([bodyPoint], object, () => { }, () => { })) {
+            if (userHoversObject([bodyPoint], object, () => { }, () => { })) {
                 if (landmarkStyles[bodyPoint].continueGrowing) {
                     landmarkStyles[bodyPoint].landmarkRadius += 0.5;
                 } else {
@@ -313,6 +316,9 @@ function userClicksObject(bodyPoints, object, trueCallback, drawingAnimation) {
                 } else {
                     continue; // This is really a continue.
                 }
+
+                cursor.x = x;
+                cursor.y = y;
 
                 if (drawingAnimation) {
                     if (drawingAnimation == "drawOuterCircle") {
@@ -381,21 +387,20 @@ function userDragsAndDropsObject(object, pickUpCallback, dragCallback, dropCallb
     if (objectClass) {
         if (!objectClass.userWantsToPickUpObject && !objectClass.userPickedUpObject) {
             if (userOpensHand()) {
-                userTouchesObject(landmarkAreas.palm, object, () => {
+                userHoversObject(landmarkAreas.palm, object, () => {
                     // User wants to pick up object, must close palm now.
                     console.log("wants to pick up");
                     objectClass.userWantsToPickUpObject = true;
-                    objectClass.selected = false;
                 }, () => { }, () => { });
             }
         } else if (objectClass.userWantsToPickUpObject && !objectClass.userPickedUpObject) {
-            if (!userTouchesObject(landmarkAreas.palm, object, () => { }, () => { })) {
+            if (!userHoversObject(landmarkAreas.palm, object, () => { }, () => { })) {
                 objectClass.userWantsToPickUpObject = false;
                 return;
             }
 
             if (userClosesHand()) {
-                userTouchesObject(landmarkAreas.palm, object, () => {
+                userHoversObject(landmarkAreas.palm, object, () => {
                     // User wants to pick up object, must close palm now.
                     console.log("picked up");
                     objectClass.userPickedUpObject = true;
@@ -404,7 +409,6 @@ function userDragsAndDropsObject(object, pickUpCallback, dragCallback, dropCallb
             }
         } else if (objectClass.userWantsToPickUpObject && objectClass.userPickedUpObject) {
             if (userClosesHand()) {
-                moveObject(object, landmarkAreas.palm);
                 dragCallback();
             } else if (userOpensHand()) {
                 dropCallback();
@@ -462,6 +466,9 @@ function moveObject(object, bodyPoints) {
     // console.log(centerPoint);
     var x = centerPoint.x;
     var y = centerPoint.y;
+
+    cursor.x = centerPoint.x;
+    cursor.y = centerPoint.y;
 
     let objectDimensions = object.getBoundingClientRect();
     var objectWidth = objectDimensions.width / 2;

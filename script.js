@@ -74,7 +74,7 @@ async function onResults(results) {
 
     var boxes = document.getElementsByClassName("box");
 
-    userTouchesObject(landmarkAreas.indexTips, boxes[0], () => {
+    userHoversObject(landmarkAreas.indexTips, boxes[0], () => {
         designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "yellowgreen", text: "you're touching me!" });
     }, () => {
         designEditGameMechanism.changeStyle(boxes[0], { backgroundColor: "aquamarine", text: "touch me with your pointer finger" });
@@ -82,11 +82,13 @@ async function onResults(results) {
 
     userClicksObject(landmarkAreas.indexTips, boxes[1], () => {
         designEditGameMechanism.changeStyle(boxes[1], { backgroundColor: "yellowgreen", text: "you clicked me!" });
+        // setTimeout(getObjectByUID(boxes[1].uid).selected = false, 5000);
     }, "drawOuterCircle");
 
     userDragsAndDropsObject(boxes[2], () => {
         designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "yellowgreen", text: "you're picked me up!" });
     }, () => {
+        moveObject(boxes[2], landmarkAreas.palm);
         designEditGameMechanism.changeStyle(boxes[2], { text: "you're dragging me!" });
     }, () => {
         designEditGameMechanism.changeStyle(boxes[2], { backgroundColor: "aquamarine", text: "you dropped me!" });

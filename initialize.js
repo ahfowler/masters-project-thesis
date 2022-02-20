@@ -1,4 +1,5 @@
 const globalObjects = [];
+var renderer;
 
 function getObjectByUID(uid) {
     var result = globalObjects.filter(function (object) { return object.id == uid; });
@@ -18,9 +19,18 @@ class DOMObject {
     }
 }
 
+class Cursor {
+    constructor() {
+        this.x = 0;
+        this.y = 0;
+    }
+}
+
 var all = document.getElementsByTagName("*");
 
 for (var i = 0, max = all.length; i < max; i++) {
     all[i].uid = uuid.v4();
     globalObjects.push(new DOMObject(all[i].uid));
 }
+
+const cursor = new Cursor();
