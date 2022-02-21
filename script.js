@@ -1,6 +1,6 @@
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
-canvasElement.width = $(window).width();
+canvasElement.width = $("#example-application").width();
 canvasElement.height = $(window).height();
 
 const canvasCtx = canvasElement.getContext('2d');
