@@ -1,0 +1,282 @@
+/* #101c2a
+#49a0c5
+#4286a7
+#3c6c8a
+#36536d */
+
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  width: 100%;
+
+  position: static;
+  top: 0;
+
+  margin: 0;
+
+  background-color: #101c2a;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+  position: relative;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.input_video {
+  display: none;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.handsfree-debugger {
+  display: none;
+}
+
+.input_video.selfie {
+  transform: scale(-1, 1);
+}
+
+.canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+  width: 100%;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 1;
+}
+
+.output_canvas {
+  display: block;
+
+  width: 100%;
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  z-index: 1;
+
+  background-color: transparent;
+}
+
+/* Application Styles */
+
+#example-application {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  margin: 0;
+
+  position: relative;
+  /* left: 0;
+  right: 0; */
+  top: 0;
+  /* bottom: 0; */
+
+  background-color: #101c2a;
+  color: #49a0c5;
+  font-family: 'Inconsolata', monospace;
+}
+
+#example-application > #landing-page {
+  text-align: center;
+  height: 30vh;
+}
+
+#example-application> #landing-page > h1 {
+  padding-top: 20vh;
+
+  color: #49a0c5;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 30px;
+  font-weight: 300;
+  margin-block-start: 0.2em;
+  margin-block-end: 0.2em;
+}
+
+#example-application> #landing-page > p {
+  color: #49a0c5;
+  font-family: 'Inconsolata', monospace;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#example-application>#demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  transition: all 3s linear;
+}
+
+#example-application>#demo>h2 {
+  color: #49a0c5;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  margin-block-start: 0.2em;
+  margin-block-end: 0.2em;
+
+  margin-top: 30vh;
+}
+
+#example-application>#demo>p {
+  color: #49a0c5;
+  font-family: 'Inconsolata', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#example-application>#demo>.box-collection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 80%;
+  /* height: 100vh; */
+
+  margin-top: 25px;
+  margin-bottom: 50px;
+}
+
+#example-application>#demo>#hover-interaction-boxes {
+  align-items: flex-start;
+  justify-content: center;
+  height: 300px;
+}
+
+#example-application>#demo>#hover-interaction-boxes>* {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  width: 100%;
+}
+
+#example-application>#demo>#hover-interaction-boxes>#black-keys {
+  left: 56.25px;
+}
+
+#example-application>#demo>.box-collection>#white-keys>.key {
+  width: 75px;
+  height: 250px;
+  border-radius: 1px;
+  background-color: #eeeeee;
+  border: #333333 solid 1px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#example-application>#demo>.box-collection>*>.key>p {
+  color: #aaaaaa;
+  text-align: center;
+  font-family: 'Inconsolata', monospace;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+#example-application>#demo>.box-collection>#black-keys>.key {
+  min-width: 37.5px;
+  height: 125px;
+  border-radius: 1px;
+  background-color: #333333;
+  border: #333333 solid 1px;
+}
+
+#example-application>#demo>.box-collection>#black-keys>.key {
+  margin: 0 37.5px 0 0;
+}
+
+#example-application>#demo>.box-collection>#black-keys>.invisible {
+  opacity: 0;
+}
+
+#example-application>#demo>#drag-interaction-boxes {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+
+  width: 80%;
+}
+
+#example-application>#demo>#drag-interaction-boxes>.target-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+
+  height: 200px;
+  width: 200px;
+
+  border: #36536d 2px dashed;
+  color: #36536d;
+}
+
+#example-application>#demo>#drag-interaction-boxes>#box {
+  height: 197px;
+  width: 197px;
+
+  position: absolute;
+  left: 4px;
+
+  background-color: #3c6c8a;
+}
+
+#example-application>#demo>#gesture-interaction-boxes>.gesture-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+
+  height: 120px;
+  width: 120px;
+
+  margin: 10px;
+  padding: 10px;
+
+  border: #36536d 1px solid;
+  color: #36536d;
+}
+
+#example-application>#demo>#gesture-interaction-boxes>.gesture-box > p {
+  font-size: 30px;
+}

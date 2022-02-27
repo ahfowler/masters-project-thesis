@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MediaPipe Desktop Application</title>
+    <meta charset="utf-8">
+
+    <!-- Download JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Download MediaPipe's Holisitic Model and Support Tools -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+
+    <!-- Download TensorFlow's Handpose Models -->
+    <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
+    <script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
+    <!-- use the WebGL backend (recommended) - you can alternatively use the WASM backend -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+
+    <!-- Download Fingerpose Gesture Recgnition Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js"></script>
+
+    <!-- Download Tone.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.min.js"></script>
+
+    <!-- Download UUID Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
+        integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="container">
+        <video class="input_video"></video>
+        <div class="canvas-container">
+            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
+        </div>
+        <div id="example-application">
+            <div id="landing-page">
+                <h1>Gesture.js</h1>
+                <p>A lightweight Javascript framework for creating immersive and embodied games on the web.</p>
+                <br />
+                <p id="loading-text">Loading...</p>
+            </div>
+
+            <div id="demo" style="opacity: 0;">
+                <h2>Touch any element on the DOM with any part of your body.</h2>
+                <p>Try playing the piano with your fingertips.</p>
+                <div id="hover-interaction-boxes" class="box-collection">
+                    <div id="white-keys">
+                        <div class="key">
+                            <p>C</p>
+                        </div>
+                        <div class="key">
+                            <p>D</p>
+                        </div>
+                        <div class="key">
+                            <p>E</p>
+                        </div>
+                        <div class="key">
+                            <p>F</p>
+                        </div>
+                        <div class="key">
+                            <p>G</p>
+                        </div>
+                        <div class="key">
+                            <p>A</p>
+                        </div>
+                        <div class="key">
+                            <p>B</p>
+                        </div>
+                        <div class="key">
+                            <p>C</p>
+                        </div>
+                        <div class="key">
+                            <p>D</p>
+                        </div>
+                    </div>
+                    <div id="black-keys">
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key"></div>
+                        <div class="key invisible"></div>
+                        <div class="key invisible"></div>
+                    </div>
+                </div>
+
+                <br />
+
+                <h2>Manipulate elements on the DOM with any gesture.</h2>
+                <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target
+                    area.</p>
+                <div id="drag-interaction-boxes" class="box-collection">
+                    <div class="target-box">Begin</div>
+                    <div class="target-box">End</div>
+                    <div id="box"></div>
+                </div>
+
+                <br />
+
+                <h2>Identify any gesture.</h2>
+                <p>Try making any of the gestures below and see it light up.</p>
+                <p>You made the <span id="gesture-name"></span> gesture!</p>
+                <div id="gesture-interaction-boxes" class="box-collection">
+                    <div class="gesture-box">
+                        Zero
+                    </div>
+                    <div class="gesture-box">
+                        One
+                    </div>
+                    <div class="gesture-box">
+                        Two
+                    </div>
+                    <div class="gesture-box">
+                        Three
+                    </div>
+                    <div class="gesture-box">
+                        Four
+                    </div>
+                    <div class="gesture-box">
+                        Five
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io();
+        </script>
+
+        <script src="./mediapipe-support/initialize.js"></script>
+        <script src="./mediapipe-support/gesturesLibrary.js"></script>
+        <script src="./mediapipe-support/interactionsLibrary.js"></script>
+        <script src="./mediapipe.js"></script>
+</body>
+
+</html>

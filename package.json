@@ -1,0 +1,9 @@
+{
+    "name": "master-thesis-project",
+    "version": "0.0.1",
+    "description": "using webrtc and mediapipe",
+    "dependencies": {
+        "express": "^4.17.3",
+        "socket.io": "^4.4.1"
+    }
+}
