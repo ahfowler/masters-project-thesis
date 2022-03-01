@@ -1,3 +1,5 @@
+import * as Kalidokit from "kalidokit";
+
 const videoElement = document.getElementsByClassName('input_video')[0];
 const canvasElement = document.getElementsByClassName('output_canvas')[0];
 canvasElement.width = $("#example-application").width();
@@ -169,6 +171,18 @@ async function onResults(results) {
     }
 
     canvasCtx.restore();
+
+    // KalidoKit code
+    let facelm = results.faceLandmarks;
+    let poselm = results.poseLandmarks;
+    let poselm3D = results.ea;
+    let rightHandlm = results.rightHandLandmarks;
+    let leftHandlm = results.leftHandLandmarks;
+
+    let faceRig = Kalidokit.Face.solve(facelm,{runtime:'mediapipe',video:HTMLVideoElement})
+    let poseRig = Kalidokit.Pose.solve(poselm3d,poselm,{runtime:'mediapipe',video:HTMLVideoElement})
+    let rightHandRig = Kalidokit.Hand.solve(rightHandlm,"Right")
+    let leftHandRig = Kalidokit.Hand.solve(leftHandlm,"Left")
 }
 
 const holistic = new Holistic({

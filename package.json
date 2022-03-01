@@ -4,6 +4,8 @@
     "description": "using webrtc and mediapipe",
     "dependencies": {
         "express": "^4.17.3",
-        "socket.io": "^4.4.1"
+        "kalidokit": "^1.1.5",
+        "socket.io": "^4.4.1",
+        "three": "^0.138.2"
     }
 }
