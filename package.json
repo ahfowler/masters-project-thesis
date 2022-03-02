@@ -2,6 +2,9 @@
     "name": "master-thesis-project",
     "version": "0.0.1",
     "description": "using webrtc and mediapipe",
+    "scripts": {
+        "start": "node server.js"
+    },
     "dependencies": {
         "express": "^4.17.3",
         "kalidokit": "^1.1.5",
