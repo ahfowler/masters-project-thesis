@@ -30,10 +30,20 @@
 </head>
 
 <body>
-    <div class="preview">
+    <div class="preview" style="display: none;">
         <video class="input_video" width="1280px" height="720px" autoplay muted playsinline></video>
         <canvas class="guides"></canvas>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var onResults;
+
+        socket.on('sentMPResults', function (results) {
+            // console.log(results);
+            onResults(results);
+        });
+    </script>
     <script type="module" src="./kalidokit.js"></script>
     <style>
         @font-face {

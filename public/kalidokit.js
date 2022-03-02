@@ -280,7 +280,7 @@ const animateVRM = (vrm, results) => {
 let videoElement = document.querySelector(".input_video"),
     guideCanvas = document.querySelector('canvas.guides');
 
-const onResults = (results) => {
+onResults = (results) => {
     // Draw landmark guides
     drawResults(results)
     // Animate model
@@ -348,11 +348,11 @@ const drawResults = (results) => {
 }
 
 // Use `Mediapipe` utils to get camera - lower resolution = higher fps
-const camera = new Camera(videoElement, {
-    onFrame: async () => {
-        await holistic.send({ image: videoElement });
-    },
-    width: 640,
-    height: 480
-});
-camera.start();
+// const camera = new Camera(videoElement, {
+//     onFrame: async () => {
+//         await holistic.send({ image: videoElement });
+//     },
+//     width: 640,
+//     height: 480
+// });
+// camera.start();
