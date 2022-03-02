@@ -45,98 +45,6 @@
             <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
         </div>
         <div id="example-application">
-            <div id="landing-page">
-                <h1>Gesture.js</h1>
-                <p>A lightweight Javascript framework for creating immersive and embodied games on the web.</p>
-                <br />
-                <p id="loading-text">Loading...</p>
-            </div>
-
-            <div id="demo" style="opacity: 0;">
-                <h2>Touch any element on the DOM with any part of your body.</h2>
-                <p>Try playing the piano with your fingertips.</p>
-                <div id="hover-interaction-boxes" class="box-collection">
-                    <div id="white-keys">
-                        <div class="key">
-                            <p>C</p>
-                        </div>
-                        <div class="key">
-                            <p>D</p>
-                        </div>
-                        <div class="key">
-                            <p>E</p>
-                        </div>
-                        <div class="key">
-                            <p>F</p>
-                        </div>
-                        <div class="key">
-                            <p>G</p>
-                        </div>
-                        <div class="key">
-                            <p>A</p>
-                        </div>
-                        <div class="key">
-                            <p>B</p>
-                        </div>
-                        <div class="key">
-                            <p>C</p>
-                        </div>
-                        <div class="key">
-                            <p>D</p>
-                        </div>
-                    </div>
-                    <div id="black-keys">
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key invisible"></div>
-                    </div>
-                </div>
-
-                <br />
-
-                <h2>Manipulate elements on the DOM with any gesture.</h2>
-                <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target
-                    area.</p>
-                <div id="drag-interaction-boxes" class="box-collection">
-                    <div class="target-box">Begin</div>
-                    <div class="target-box">End</div>
-                    <div id="box"></div>
-                </div>
-
-                <br />
-
-                <h2>Identify any gesture.</h2>
-                <p>Try making any of the gestures below and see it light up.</p>
-                <p>You made the <span id="gesture-name"></span> gesture!</p>
-                <div id="gesture-interaction-boxes" class="box-collection">
-                    <div class="gesture-box">
-                        Zero
-                    </div>
-                    <div class="gesture-box">
-                        One
-                    </div>
-                    <div class="gesture-box">
-                        Two
-                    </div>
-                    <div class="gesture-box">
-                        Three
-                    </div>
-                    <div class="gesture-box">
-                        Four
-                    </div>
-                    <div class="gesture-box">
-                        Five
-                    </div>
-                </div>
-            </div>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
@@ -147,7 +55,7 @@
         <script src="./mediapipe-support/initialize.js"></script>
         <script src="./mediapipe-support/gesturesLibrary.js"></script>
         <script src="./mediapipe-support/interactionsLibrary.js"></script>
-        <script src="./mediapipe.js"></script>
+        <script src="./index.js"></script>
 </body>
 
 </html>

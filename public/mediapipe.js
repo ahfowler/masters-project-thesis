@@ -47,7 +47,7 @@ async function onResults(results) {
     // hand prediction from the MediaPipe graph.
     predictions = await model.estimateHands(document.querySelector("video"), false);
     mpResults = results;
-    socket.emit('recievedMPResults', results); // Send the results to mobile phone.
+    // socket.emit('recievedMPResults', results); // Send the results to mobile phone.
 
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
