@@ -2,6 +2,7 @@
     "name": "master-thesis-project",
     "version": "0.0.1",
     "description": "using webrtc and mediapipe",
+    "main": "server.js",
     "scripts": {
         "start": "node server.js"
     },
