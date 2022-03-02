@@ -41,6 +41,13 @@ io.on('connection', (socket) => {
 // });
 
 
-server.listen(8080, () => {
-    console.log('listening on localhost:8080');
-});
+// server.listen(8080, () => {
+//     console.log('listening on localhost:8080');
+// });
+
+// Establishing the port
+const PORT = process.env.PORT || 8080;
+ 
+// Executing the server on given port number
+server.listen(PORT, console.log(
+  `Server started on port ${PORT}`));
