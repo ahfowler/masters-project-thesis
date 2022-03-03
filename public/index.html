@@ -34,8 +34,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
         integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+        <!--     Kalidokit Kinematic Solver -->
+    <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
 
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
@@ -45,6 +48,8 @@
             <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
         </div>
         <div id="example-application">
+            <div>See your 3D model!</div>
+            <a href="./kalidokit.html" target="_blank" rel="noopener noreferrer">Enter</a>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>

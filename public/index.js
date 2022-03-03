@@ -21,98 +21,58 @@ async function onResults(results) {
         videoLoaded = true;
     }
 
-    // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain a
-    // hand prediction from the MediaPipe graph.
     predictions = await model.estimateHands(document.querySelector("video"), false);
     mpResults = results;
+
+    // Draw landmarks for the person.
+    drawResults(results);
+
+    // Solve KalidoKit.
+    // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
+
+    const faceLandmarks = results.faceLandmarks;
+    // Pose 3D Landmarks are with respect to Hip distance in meters
+    const pose3DLandmarks = results.ea;
+    // Pose 2D landmarks are with respect to videoWidth and videoHeight
+    const pose2DLandmarks = results.poseLandmarks;
+    // Be careful, hand landmarks may be reversed
+    const leftHandLandmarks = results.rightHandLandmarks;
+    const rightHandLandmarks = results.leftHandLandmarks;
+
+    let riggedCharacter = {};
+
+    // Animate Face
+    if (faceLandmarks) {
+        riggedCharacter.riggedFace = Kalidokit.Face.solve(faceLandmarks, {
+            runtime: "mediapipe",
+            video: videoElement,
+            imageSize: { height: 0, width: 0 },
+            smoothBlink: true, // smooth left and right eye blink delays
+            blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivit
+        });
+    }
+
+    // Animate Pose
+    if (pose2DLandmarks && pose3DLandmarks) {
+        riggedCharacter.riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
+            runtime: "mediapipe",
+            video: videoElement,
+            imageSize: { height: 0, width: 0 },
+            enableLegs: true,
+        });
+    }
+
+    // Animate Hands
+    if (leftHandLandmarks) {
+        riggedCharacter.riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
+    }
+
+    if (rightHandLandmarks) {
+        riggedCharacter.riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
+    }
+
     socket.emit('recievedMPResults', results); // Send the results to mobile phone.
-
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-    if (results.poseLandmarks) {
-        // Pose...
-        drawingUtils.drawConnectors(
-            canvasCtx, results.poseLandmarks, mpHolistic.POSE_CONNECTIONS,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawLandmarks(
-            canvasCtx,
-            mpHolistic.POSE_LANDMARKS_LEFT,
-            {
-                color: '#36536d',
-                fillColor: '#36536d',
-                lineWidth: 3,
-                radius: (data) => {
-                    return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
-                }
-            });
-        drawingUtils.drawLandmarks(
-            canvasCtx,
-            mpHolistic.POSE_LANDMARKS_RIGHT,
-            {
-                color: '#36536d',
-                fillColor: '#36536d',
-                lineWidth: 3,
-                radius: (data) => {
-                    return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
-                }
-            });
-    }
-
-    // Face...
-    if (results.faceLandmarks) {
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_TESSELATION,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_RIGHT_EYE,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_RIGHT_EYEBROW,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_LEFT_EYE,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_LEFT_EYEBROW,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_FACE_OVAL,
-            { color: '#36536d', lineWidth: 3 });
-        drawingUtils.drawConnectors(
-            canvasCtx, results.faceLandmarks, mpHolistic.FACEMESH_LIPS,
-            { color: '#36536d', lineWidth: 3 });
-    }
-
-    if (results.rightHandLandmarks) {
-        drawingUtils.drawConnectors(
-            canvasCtx, results.rightHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-            { color: '#36536d', lineWidth: 3 });
-
-        drawingUtils.drawLandmarks(canvasCtx, results.rightHandLandmarks, {
-            color: '#36536d',
-            fillColor: '#36536d',
-            lineWidth: 3,
-            radius: (data) => {
-                return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
-            }
-        });
-    }
-
-    if (results.leftHandLandmarks) {
-        drawingUtils.drawConnectors(
-            canvasCtx, results.leftHandLandmarks, mpHolistic.HAND_CONNECTIONS,
-            { color: '#36536d', lineWidth: 3 });
-
-        drawingUtils.drawLandmarks(canvasCtx, results.leftHandLandmarks, {
-            color: '#36536d',
-            fillColor: '#36536d',
-            lineWidth: 3,
-            radius: (data) => {
-                return drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
-            }
-        });
-    }
+    socket.emit('recievedRiggedData', riggedCharacter); // Send the rig data to mobile phone.
 
     canvasCtx.restore();
 }
@@ -124,17 +84,87 @@ const holistic = new Holistic({
 });
 
 holistic.setOptions({
-    selfieMode: true,
+    selfieMode: false,
     modelComplexity: 1,
-    smoothLandmarks: true,
-    enableSegmentation: false,
-    smoothSegmentation: true,
-    minDetectionConfidence: 0.5,
+    minDetectionConfidence: 0.8,
     minTrackingConfidence: 0.8,
-    effect: 'background',
+    smoothLandmarks: true,
+    smoothSegmentation: true,
+    refineFaceLandmarks: true,
+    enableSegmentation: true
 });
 
 holistic.onResults(onResults);
+
+const poseHands = [21, 19, 17, 20, 18, 22];
+const poseFace = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const drawResults = (results) => {
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    // Pose
+    if (results.poseLandmarks) {
+        const poseLandmarksWithoutHands = results.poseLandmarks.filter((landmark, index) => {
+            return !(poseHands.includes(index));
+        });
+
+        const poseLandmarksWithoutFace = results.poseLandmarks.filter((landmark, index) => {
+            return !(poseFace.includes(index));
+        });
+
+        const poseLandmarksWithFace = results.poseLandmarks.filter((landmark, index) => {
+            return (poseFace.includes(index));
+        });
+
+        drawConnectors(canvasCtx, poseLandmarksWithoutHands, POSE_CONNECTIONS, {
+            color: "#EEEEEE",
+            lineWidth: 2
+        });
+
+        drawConnectors(canvasCtx, poseLandmarksWithFace, POSE_CONNECTIONS, {
+            color: "#FFFFFF",
+            lineWidth: 2
+        });
+
+        drawLandmarks(canvasCtx, poseLandmarksWithoutHands.filter(x => poseLandmarksWithoutFace.includes(x)), {
+            color: "#EEEEEE",
+            lineWidth: 2
+        });
+    }
+
+    // Face Mesh
+    drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
+        color: "#EEEEEE",
+        lineWidth: 2
+    });
+
+    // Pupils
+    if (results.faceLandmarks && results.faceLandmarks.length === 478) {
+        drawLandmarks(canvasCtx, [results.faceLandmarks[468], results.faceLandmarks[468 + 5]], {
+            color: "#49a0c5",
+            lineWidth: 5
+        });
+    }
+
+    // Hands
+    drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
+        color: "#EEEEEE",
+        lineWidth: 2
+    });
+    drawLandmarks(canvasCtx, results.leftHandLandmarks, {
+        color: "#EEEEEE",
+        lineWidth: 2
+    });
+    drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
+        color: "#EEEEEE",
+        lineWidth: 2
+    });
+    drawLandmarks(canvasCtx, results.rightHandLandmarks, {
+        color: "#EEEEEE",
+        lineWidth: 2
+    });
+}
 
 const camera = new Camera(videoElement, {
     onFrame: async () => {

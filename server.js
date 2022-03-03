@@ -15,8 +15,11 @@ app.get('/', (req, res) => {
 // When a user opens the application...
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.broadcast.emit("userConnected", socket.id); // Broadcast new user entering.
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
+        socket.broadcast.emit("userDisconnected", socket.id); // Broadcast new user entering.
     });
 });
 
@@ -25,6 +28,13 @@ io.on('connection', (socket) => {
     socket.on('recievedMPResults', (results) => {
         // console.log(results);
         socket.broadcast.emit("sentMPResults", results); // Broadcast the results to the mobile users.
+    });  
+});
+
+io.on('connection', (socket) => {
+    socket.on('recievedRiggedData', (data) => {
+        // console.log(results);
+        socket.broadcast.emit("sentRiggedData", data); // Broadcast the rigged data to the mobile users.
     });  
 });
 
