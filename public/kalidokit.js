@@ -21,16 +21,16 @@ orbitCamera.position.set(0.0, 1.0, 2.3);
 // controls
 const orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
 orbitControls.screenSpacePanning = true;
-orbitControls.target.set(0.0, 1.0, 0.0);
+orbitControls.target.set(0.0, 1.0, 2.0);
 orbitControls.update();
 
 // scene
 const scene = new THREE.Scene();
 
-// const dolly = new THREE.Object3D;
-// dolly.position.set(0.0, -0.5, 1.0);
-// dolly.add(orbitCamera);
-// scene.add(dolly);
+const dolly = new THREE.Object3D;
+dolly.position.set(0.0, -0.1, 2.0);
+dolly.add(orbitCamera);
+scene.add(dolly);
 
 // const dummyCam = new THREE.Object3D();
 // orbitCamera.add(dummyCam);
@@ -44,8 +44,8 @@ scene.add(light);
 const clock = new THREE.Clock();
 
 function animate() {
-    // renderer.setAnimationLoop(animate);
-    requestAnimationFrame(animate);
+    renderer.setAnimationLoop(animate);
+    // requestAnimationFrame(animate);
 
     if (currentVrm) {
         // Update model to render physics
@@ -56,8 +56,8 @@ function animate() {
 }
 animate();
 
-// document.body.appendChild(VRButton.createButton(renderer));
-// renderer.xr.enabled = true;
+document.body.appendChild(VRButton.createButton(renderer));
+renderer.xr.enabled = true;
 
 /* VRM CHARACTER SETUP */
 // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
