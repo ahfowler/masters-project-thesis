@@ -38,6 +38,14 @@ io.on('connection', (socket) => {
     });  
 });
 
+// When a user selects a character.
+io.on('connection', (socket) => {
+    socket.on('receivedVRMModel', (vrmURL) => {
+        // console.log(results);
+        socket.broadcast.emit("sentVRMModel", vrmURL, socket.id); // Broadcast the new character to the mobile users.
+    });  
+});
+
 // io.on('connection', (socket) => {
 //     socket.on('chat message', (msg) => {
 //         console.log('message: ' + msg);

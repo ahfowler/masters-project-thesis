@@ -106,3 +106,20 @@ body {
 #example-application {
 
 }
+
+/* Welcome Page */
+#welcome-message {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.character-box > div {
+  height: 100px;
+  width: 100px;
+  background-position: center;
+  background-size: cover;
+  margin: 10px;
+  cursor: pointer;
+}

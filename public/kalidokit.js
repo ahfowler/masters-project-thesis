@@ -28,7 +28,7 @@ orbitControls.update();
 const scene = new THREE.Scene();
 
 const dolly = new THREE.Object3D;
-dolly.position.set(0.0, -0.1, 2.0);
+dolly.position.set(0.0, -0.1, 1.2);
 dolly.add(orbitCamera);
 scene.add(dolly);
 
@@ -90,9 +90,9 @@ loader.load(
     error => console.error(error)
 );
 
-loadUser = function (socketID) {
+loadUser = function (socketID, modelURL) {
     loader.load(
-        "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
+        modelURL,
 
         gltf => {
             THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);

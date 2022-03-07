@@ -176,3 +176,8 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
+function sendModel(modelName) {
+    let vrmURL = "./vrm-models/" + modelName + ".vrm";
+    socket.emit("receivedVRMModel", vrmURL);
+}
+
