@@ -176,8 +176,23 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
-function sendModel(modelName) {
-    let vrmURL = "./vrm-models/" + modelName + ".vrm";
-    socket.emit("receivedVRMModel", vrmURL);
+function chooseModel(modelName) {
+    vrmURL = "./vrm-models/" + modelName + ".vrm";
+    document.getElementById(modelName).style.border = "2px solid black";
+
+    let otherCharacters = document.getElementsByClassName("character-box");
+    for (var i = 0; i < otherCharacters.length; i++) {
+        if (otherCharacters[i].id != modelName) {
+            otherCharacters[i].style.border = "0px solid transparent";
+        }
+    }
+}
+
+function sendModel() {
+    let userName = document.getElementById("name-input").value;
+
+    window.open("./kalidokit.html", '_blank', 'location=yes,height=1152,width=864,scrollbars=no,status=yes');
+
+    socket.emit("receivedVRMModel", vrmURL, userName); // Send model details.
 }
 

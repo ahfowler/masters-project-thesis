@@ -5,6 +5,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 var path = require('path');
+const fs = require('fs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -12,14 +13,52 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html/');
 });
 
-// When a user opens the application...
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    socket.broadcast.emit("userConnected", socket.id); // Broadcast new user entering.
+var classroomSocketID;
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-        socket.broadcast.emit("userDisconnected", socket.id); // Broadcast new user entering.
+// When a user opens any application...
+io.on('connection', (socket) => {
+    socket.on('classroomConnected', () => {
+        classroomSocketID = socket.id;
+        console.log('classroom ' + socket.id + ' connected');
+        console.log("Getting connected users...");
+
+        fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                let users = JSON.parse(data);
+                console.log("Sending connected users to classroom...", users);
+                socket.emit("recievedConnectedUsers", users); // Broadcast the connected users.
+            }
+        });
+    });
+
+
+    socket.on("disconnect", () => {
+        if (socket.id != classroomSocketID) {
+            console.log("user " + socket.id + " disconnecting...");
+
+            fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    let users = JSON.parse(data);
+                    for (var i = 0; i < users.length; i++) {
+                        if (users[i].socketID == socket.id) {
+                            users.splice(i, 1); // Remove the user.
+                            break;
+                        }
+                    }
+                    jsonString = JSON.stringify(users);
+                    fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => {
+                        console.log("Updated connected users to classroom...", users);
+                        socket.emit("recievedConnectedUsers", users); // Broadcast the connected users.
+                    });
+
+                    socket.broadcast.emit("removeModel", socket.id);
+                }
+            });
+        }
     });
 });
 
@@ -27,45 +66,53 @@ io.on('connection', (socket) => {
 io.on('connection', (socket) => {
     socket.on('recievedMPResults', (results) => {
         // console.log(results);
-        socket.broadcast.emit("sentMPResults", results); // Broadcast the results to the mobile users.
-    });  
-});
+        socket.broadcast.emit("sentMPResults", results, socket.id); // Broadcast the results to the mobile users.
+    });
 
-io.on('connection', (socket) => {
     socket.on('recievedRiggedData', (data) => {
         // console.log(results);
-        socket.broadcast.emit("sentRiggedData", data); // Broadcast the rigged data to the mobile users.
-    });  
+        socket.broadcast.emit("sentRiggedData", data, socket.id); // Broadcast the rigged data to the mobile users.
+    });
 });
 
 // When a user selects a character.
 io.on('connection', (socket) => {
-    socket.on('receivedVRMModel', (vrmURL) => {
-        // console.log(results);
-        socket.broadcast.emit("sentVRMModel", vrmURL, socket.id); // Broadcast the new character to the mobile users.
-    });  
+    socket.on('receivedVRMModel', (vrmURL, userName) => {
+
+        fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                users = JSON.parse(data);
+
+                // Check if user already has a model.
+                let foundModel = false;
+                for (var i = 0; i < users.length; i++) {
+                    if (users[i].socketID == socket.id) {
+                        users[i].userName = userName;
+                        users[i].vrmURL = vrmURL;
+                        foundModel = true;
+                        break;
+                    }
+                }
+
+                // If the user doesn't have a model, make a new one.
+                if (!foundModel) {
+                    users.push({ socketID: socket.id, userName: userName, vrmURL: vrmURL });
+                }
+
+                jsonString = JSON.stringify(users);
+                fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => {
+                    socket.broadcast.emit("sentVRMModel", vrmURL, socket.id, userName); // Broadcast the new character to the mobile users.
+                });
+            }
+        });
+    });
 });
-
-// io.on('connection', (socket) => {
-//     socket.on('chat message', (msg) => {
-//         console.log('message: ' + msg);
-//     });
-// });
-
-// io.on('connection', (socket) => {
-//     socket.on('chat message', (msg) => {
-//         io.emit('chat message', msg);
-//     });
-// });
-
-
-// server.listen(8080, () => {
-//     console.log('listening on localhost:8080');
-// });
 
 // Establishing the port
 const PORT = process.env.PORT || 8080;
- 
+
 // Executing the server on given port number
 server.listen(PORT, console.log(
-  `Server started on port ${PORT}`));
+    `Server started on port ${PORT}`));

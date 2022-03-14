@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>MediaPipe Desktop Application</title>
+    <title>Gesture.js Demo: Embodied Virtual Reality</title>
     <meta charset="utf-8">
 
     <!-- Download JQuery -->
@@ -39,35 +39,32 @@
     <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
 
     <link rel="stylesheet" href="./index.css">
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        var socket = io();
-    </script>
 </head>
 
 <body>
     <div class="container">
         <video class="input_video"></video>
         <div class="canvas-container">
-            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
+            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"
+                style="display: none;"></canvas>
         </div>
         <div id="example-application">
             <div id="welcome-message">
-                <h2>Welcome to Your Embodied Classroom</h2>
+                <h2>Welcome to Your Embodied Virtual Space</h2>
                 <div>
                     <h3>What's your name?</h3>
                     <input type="text" id="name-input"></input>
                     <h3>Choose your character.</h3>
                     <div style="display: flex; justify-content: center;">
-                        <div class="character-box" onclick="sendModel('modelA')">
+                        <div id="modelA" class="character-box" onclick="chooseModel('modelA')">
                             <div style="background-image:url(./vrm-models/modelA.png)"></div>
                             <p>Model A</p>
                         </div>
-                        <div class="character-box" onclick="sendModel('modelB')">
+                        <div id="modelB" class="character-box" onclick="chooseModel('modelB')">
                             <div style="background-image:url(./vrm-models/modelB.png)"></div>
                             <p>Model B</p>
                         </div>
-                        <div class="character-box" onclick="sendModel('modelC')">
+                        <div id="modelC" class="character-box" onclick="chooseModel('modelC')">
                             <div style="background-image:url(./vrm-models/modelC.png)"></div>
                             <p>Model C</p>
                         </div>
@@ -75,11 +72,16 @@
                 </div>
             </div>
 
-            <a href="./kalidokit.html" target="_blank" rel="noopener noreferrer">Enter</a>
+            <a target="_blank" rel="noopener noreferrer" onclick="sendModel()">Enter</a>
         </div>
-        <script src="./mediapipe-support/initialize.js"></script>
+        <!-- <script src="./mediapipe-support/initialize.js"></script>
         <script src="./mediapipe-support/gesturesLibrary.js"></script>
-        <script src="./mediapipe-support/interactionsLibrary.js"></script>
+        <script src="./mediapipe-support/interactionsLibrary.js"></script> -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io();
+            var modelName = "";
+        </script>
         <script src="./index.js"></script>
 </body>
 

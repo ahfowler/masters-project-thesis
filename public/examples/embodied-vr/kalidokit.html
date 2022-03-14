@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <!-- HTML Meta Tags -->
+    <title>Virtual Classroom</title>
+    <meta name="description" content="Track face and body rigs just your browser webcam!" />
+
+    <!--     Basic Three.js -->
+    <script src="https://unpkg.com/three@0.133.0/build/three.js"></script>
+    <!-- <script type="module" src="https://unpkg.com/three@0.133.0/examples/jsm/webxr/VRButton.js"></script> -->
+    <!--     GLTF Loader for Three.js -->
+    <script src="https://unpkg.com/three@0.133.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!--     Orbit Controls for Three.js -->
+    <script src="https://unpkg.com/three@0.133.0/examples/js/controls/OrbitControls.js"></script>
+    <!--     VRM Loader for Three.js -->
+    <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
+    <!--     Mediapipe or Tensorflow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/holistic.js"
+        crossorigin="anonymous"></script>
+
+    <!--     Mediapipe Drawing Tools -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <!--     Mediapipe Camera Tools -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
+</head>
+
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var onResults, loadUser, removeModel;
+        var virtualModels = {};
+        var connectedUsers = [];
+        var socketID;
+
+        let cameraXPosition, cameraZPosition, xPosition;
+
+        socket.on('recievedConnectedUsers', function (cUsers) {
+            connectedUsers = cUsers;
+
+            // Initialize the room!
+            connectedUsers.forEach((user) => {
+                loadUser(user.socketID, user.vrmURL);
+            });
+
+            socket.on('sentMPResults', function (results, sID) {
+                // console.log(results);
+
+                socket.on('sentRiggedData', function (riggedData, sID) {
+                    // console.log(riggedData);
+                    virtualModels[sID].riggedCharacter = riggedData;
+                    onResults(results, sID);
+                });
+            });
+        });
+
+        socket.emit("classroomConnected"); // Let everyone know that classroom is online.
+
+        // Recieve a new user connection while connected.
+        socket.on('sentVRMModel', (vrmURL, sID, userName) => {
+            connectedUsers.push({ socketID: sID, userName: userName, vrmURL: vrmURL });
+            loadUser(sID, vrmURL);
+        });
+
+        socket.on('removeModel', (sID) => {
+            // Remove from connected users
+            // Remove from virtual models
+
+            // Remove from scene.
+            removeModel(sID);
+        });
+
+    </script>
+    <script type="module" src="./kalidokit.js"></script>
+</body>
+
+</html>

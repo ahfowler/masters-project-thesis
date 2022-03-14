@@ -8,6 +8,10 @@ const lerp = Kalidokit.Vector.lerp;
 /* THREEJS WORLD SETUP */
 let currentVrm;
 
+xPosition = 0.0;
+cameraXPosition = 0.0;
+cameraZPosition = 2.0;
+
 // renderer
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -15,11 +19,11 @@ renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
 // camera
-const orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-orbitCamera.position.set(0.0, 1.0, 2.3);
+var orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+orbitCamera.position.set(0.0, 1.0, 2.0);
 
 // controls
-const orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
+var orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
 orbitControls.screenSpacePanning = true;
 orbitControls.target.set(0.0, 1.0, 2.0);
 orbitControls.update();
@@ -27,7 +31,7 @@ orbitControls.update();
 // scene
 const scene = new THREE.Scene();
 
-const dolly = new THREE.Object3D;
+var dolly = new THREE.Object3D;
 dolly.position.set(0.0, -0.1, 1.2);
 dolly.add(orbitCamera);
 scene.add(dolly);
@@ -66,29 +70,6 @@ var riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 // Import Character VRM
 const loader = new THREE.GLTFLoader();
 loader.crossOrigin = "anonymous";
-// Import model from URL, add your own model here
-loader.load(
-    "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
-
-    gltf => {
-        THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
-
-        THREE.VRM.from(gltf).then(vrm => {
-            scene.add(vrm.scene);
-            currentVrm = vrm;
-            currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-        });
-    },
-
-    progress =>
-        console.log(
-            "Loading model...",
-            100.0 * (progress.loaded / progress.total),
-            "%"
-        ),
-
-    error => console.error(error)
-);
 
 loadUser = function (socketID, modelURL) {
     loader.load(
@@ -98,10 +79,19 @@ loadUser = function (socketID, modelURL) {
             THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
             THREE.VRM.from(gltf).then(vrm => {
-                scene.add(vrm.scene);
-                // currentVrm = vrm;
+                let object = vrm.scene;
+                object.name = socketID;
+                scene.add(object);
+
+                virtualModels[socketID] = {};
+                virtualModels[socketID].riggedCharacter = {};
+                virtualModels[socketID].vrm = vrm;
+
                 vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                vrm.scene.position.x = 1.0;
+                vrm.scene.position.x = xPosition++;
+                // vrm.scene.position.z = zPosition;
+
+                updateCamera();
             });
         },
 
@@ -197,7 +187,7 @@ const rigFace = (riggedFace) => {
 }
 
 /* VRM Character Animator */
-const animateVRM = (vrm, results) => {
+const animateVRM = (vrm, results, sID) => {
     if (!vrm) {
         return;
     }
@@ -213,13 +203,13 @@ const animateVRM = (vrm, results) => {
 
     // Animate Face
     if (faceLandmarks) {
-        riggedFace = riggedCharacter.riggedFace;
+        riggedFace = virtualModels[sID].riggedCharacter.riggedFace;
         rigFace(riggedFace);
     }
 
     // Animate Pose
     if (pose2DLandmarks && pose3DLandmarks) {
-        riggedPose = riggedCharacter.riggedPose;
+        riggedPose = virtualModels[sID].riggedCharacter.riggedPose;
         rigRotation("Hips", riggedPose.Hips.rotation, 0.01);
         // rigPosition(
         //     "Hips",
@@ -246,7 +236,7 @@ const animateVRM = (vrm, results) => {
 
     // Animate Hands
     if (leftHandLandmarks && riggedPose.LeftHand.LeftWrist) {
-        riggedLeftHand = riggedCharacter.riggedLeftHand;
+        riggedLeftHand = virtualModels[sID].riggedCharacter.riggedLeftHand;
         rigRotation("LeftHand", {
             // Combine pose rotation Z and hand rotation X Y
             z: riggedPose.LeftHand.z,
@@ -270,7 +260,7 @@ const animateVRM = (vrm, results) => {
         rigRotation("LeftLittleDistal", riggedLeftHand.LeftLittleDistal);
     }
     if (rightHandLandmarks && riggedPose.RightHand.RightWrist) {
-        riggedRightHand = riggedCharacter.riggedRightHand;
+        riggedRightHand = virtualModels[sID].riggedCharacter.riggedRightHand;
         rigRotation("RightHand", {
             // Combine Z axis from pose hand and X/Y axis from hand wrist rotation
             z: riggedPose.RightHand.z,
@@ -296,7 +286,41 @@ const animateVRM = (vrm, results) => {
 };
 
 
-onResults = (results) => {
+onResults = (results, socketID) => {
     // Animate model
-    animateVRM(currentVrm, results);
+    currentVrm = virtualModels[socketID].vrm;
+    animateVRM(currentVrm, results, socketID);
+}
+
+removeModel = (sID) => {
+    var selectedObject = scene.getObjectByName(sID);
+    scene.remove(selectedObject);
+
+    if (xPosition > 0) {
+        xPosition--;
+    }
+
+    updateCamera(true);
+}
+
+var updateCamera = (remove) => {
+    if (remove) {
+        cameraXPosition -= 0.35;
+        cameraZPosition -= 0.5;
+    } else {
+        cameraXPosition += 0.35;
+        cameraZPosition += 0.5;
+    }
+
+    // camera
+    orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+    orbitCamera.position.set(cameraXPosition, 1.0, cameraZPosition);
+
+    // controls
+    orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
+    orbitControls.screenSpacePanning = true;
+    orbitControls.target.set(cameraXPosition, 1.0, 2.0);
+    orbitControls.update();
+
+    animate();
 }
