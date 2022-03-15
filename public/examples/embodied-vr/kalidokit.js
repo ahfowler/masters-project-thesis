@@ -20,6 +20,7 @@ document.body.appendChild(renderer.domElement);
 
 // scene
 const scene = new THREE.Scene();
+scene.background = new THREE.Color( 0xff0000 );
 
 
 let cameraControls;
