@@ -17,10 +17,19 @@ var classroomSocketID;
 
 // When a user opens any application...
 io.on('connection', (socket) => {
+    socket.on('getSocketID', () => {
+        console.log("Giving the client their socket ID...");
+        let socketID = socket.id;
+        socket.emit('recievedSocketID', socketID);
+    });
+
     socket.on('classroomConnected', () => {
         classroomSocketID = socket.id;
         console.log('classroom ' + socket.id + ' connected');
         console.log("Getting connected users...");
+
+        // Let the client that opened the window know your socketID.
+        socket.broadcast.emit("sendMainUserDetails", classroomSocketID);
 
         fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
             if (err) {
@@ -28,7 +37,7 @@ io.on('connection', (socket) => {
             } else {
                 let users = JSON.parse(data);
                 console.log("Sending connected users to classroom...", users);
-                socket.emit("recievedConnectedUsers", users); // Broadcast the connected users.
+                socket.emit("recievedConnectedUsers", users, classroomSocketID); // Broadcast the connected users the classroom socket ID.
             }
         });
     });
@@ -64,49 +73,84 @@ io.on('connection', (socket) => {
 
 // When a desktop application gets MediaPipe results, broadcast it to the mobile phone.
 io.on('connection', (socket) => {
-    socket.on('recievedMPResults', (results) => {
+    socket.on('recievedMPResults', (results, indexSocketID) => {
         // console.log(results);
-        socket.broadcast.emit("sentMPResults", results, socket.id); // Broadcast the results to the mobile users.
+        socket.broadcast.emit("sentMPResults", results, indexSocketID); // Broadcast the results to the mobile users.
     });
 
-    socket.on('recievedRiggedData', (data) => {
+    socket.on('recievedRiggedData', (data, indexSocketID) => {
         // console.log(results);
-        socket.broadcast.emit("sentRiggedData", data, socket.id); // Broadcast the rigged data to the mobile users.
+        socket.broadcast.emit("sentRiggedData", data, indexSocketID); // Broadcast the rigged data to the mobile users.
     });
 });
 
-// When a user selects a character.
+// When a user selects a character and sends it.
 io.on('connection', (socket) => {
-    socket.on('receivedVRMModel', (vrmURL, userName) => {
+    // Recieve the main character model from the client.
+    socket.on('sendMainVRMModel', (vrmURL, userName, indexSocketID, cSocketID) => {
+        if (classroomSocketID == cSocketID) {
+            fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    users = JSON.parse(data);
 
-        fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
-            if (err) {
-                console.log(err);
-            } else {
-                users = JSON.parse(data);
-
-                // Check if user already has a model.
-                let foundModel = false;
-                for (var i = 0; i < users.length; i++) {
-                    if (users[i].socketID == socket.id) {
-                        users[i].userName = userName;
-                        users[i].vrmURL = vrmURL;
-                        foundModel = true;
-                        break;
+                    // Check if user already has a model.
+                    let foundModel = false;
+                    for (var i = 0; i < users.length; i++) {
+                        if (users[i].socketID == indexSocketID) {
+                            users[i].userName = userName;
+                            users[i].vrmURL = vrmURL;
+                            foundModel = true;
+                            break;
+                        }
                     }
-                }
 
-                // If the user doesn't have a model, make a new one.
-                if (!foundModel) {
-                    users.push({ socketID: socket.id, userName: userName, vrmURL: vrmURL });
-                }
+                    // If the user doesn't have a model, make a new one.
+                    if (!foundModel) {
+                        users.push({ socketID: indexSocketID, userName: userName, vrmURL: vrmURL });
+                    }
 
-                jsonString = JSON.stringify(users);
-                fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => {
-                    socket.broadcast.emit("sentVRMModel", vrmURL, socket.id, userName); // Broadcast the new character to the mobile users.
-                });
-            }
-        });
+                    jsonString = JSON.stringify(users);
+                    fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => {
+                        socket.broadcast.emit("recievedMainVRMModel", vrmURL, indexSocketID, userName); // Tell the classroom your main character.                    // Broadcast the new character to the mobile users.
+                    });
+                }
+            });
+        }
+    });
+
+    socket.on('sendVRMModel', (vrmURL, userName, indexSocketID, cSocketID) => {
+        if (classroomSocketID != cSocketID) {
+            fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    users = JSON.parse(data);
+
+                    // Check if user already has a model.
+                    let foundModel = false;
+                    for (var i = 0; i < users.length; i++) {
+                        if (users[i].socketID == indexSocketID) {
+                            users[i].userName = userName;
+                            users[i].vrmURL = vrmURL;
+                            foundModel = true;
+                            break;
+                        }
+                    }
+
+                    // If the user doesn't have a model, make a new one.
+                    if (!foundModel) {
+                        users.push({ socketID: indexSocketID, userName: userName, vrmURL: vrmURL });
+                    }
+
+                    jsonString = JSON.stringify(users);
+                    fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => {
+                        socket.broadcast.emit("recievedVRMModel", vrmURL, indexSocketID, userName); // Broadcast the new character to the mobile users.
+                    });
+                }
+            });
+        }
     });
 });
 

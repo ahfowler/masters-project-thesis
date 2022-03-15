@@ -71,8 +71,8 @@ async function onResults(results) {
         riggedCharacter.riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
     }
 
-    socket.emit('recievedMPResults', results); // Send the results to mobile phone.
-    socket.emit('recievedRiggedData', riggedCharacter); // Send the rig data to mobile phone.
+    socket.emit('recievedMPResults', results, socketID); // Send the results to mobile phone.
+    socket.emit('recievedRiggedData', riggedCharacter, socketID); // Send the rig data to mobile phone.
 
     canvasCtx.restore();
 }
@@ -189,10 +189,6 @@ function chooseModel(modelName) {
 }
 
 function sendModel() {
-    let userName = document.getElementById("name-input").value;
-
-    window.open("./kalidokit.html", '_blank', 'location=yes,height=1152,width=864,scrollbars=no,status=yes');
-
-    socket.emit("receivedVRMModel", vrmURL, userName); // Send model details.
+    socket.emit("getSocketID");
 }
 

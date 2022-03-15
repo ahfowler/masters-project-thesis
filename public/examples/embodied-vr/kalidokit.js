@@ -18,31 +18,97 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
-// camera
-var orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-orbitCamera.position.set(0.0, 1.0, 2.0);
-
-// controls
-var orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
-orbitControls.screenSpacePanning = true;
-orbitControls.target.set(0.0, 1.0, 2.0);
-orbitControls.update();
-
 // scene
 const scene = new THREE.Scene();
 
-var dolly = new THREE.Object3D;
-dolly.position.set(0.0, -0.1, 1.2);
-dolly.add(orbitCamera);
-scene.add(dolly);
 
-// const dummyCam = new THREE.Object3D();
-// orbitCamera.add(dummyCam);
+let cameraControls;
 
-// light
-const light = new THREE.DirectionalLight(0xffffff);
-light.position.set(1.0, 1.0, 1.0).normalize();
-scene.add(light);
+let groundMirror, verticalMirror;
+
+let geometry, material;
+
+
+// camera
+const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 400);
+camera.position.set(0, 3.0, 2.0);
+
+cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+cameraControls.target.set(0, 3.0, -25.0);
+cameraControls.maxDistance = 400;
+cameraControls.minDistance = 5;
+cameraControls.update();
+
+const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
+
+// reflectors/mirrors
+
+geometry = new THREE.CircleGeometry(30, 30);
+groundMirror = new THREE.Reflector(geometry, {
+    clipBias: 0.003,
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    color: 0x777777
+});
+groundMirror.position.y = 0.5;
+groundMirror.rotateX(- Math.PI / 2);
+scene.add(groundMirror);
+
+geometry = new THREE.PlaneGeometry(100, 100);
+verticalMirror = new THREE.Reflector(geometry, {
+    clipBias: 0.003,
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    color: 0x889999
+});
+verticalMirror.position.y = 50;
+verticalMirror.position.z = - 30;
+scene.add(verticalMirror);
+
+// walls
+const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: "orange" }));
+planeTop.position.y = 100;
+planeTop.rotateX(Math.PI / 2);
+scene.add(planeTop);
+
+const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xffffff }));
+planeBottom.rotateX(- Math.PI / 2);
+scene.add(planeBottom);
+
+const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x7f7fff }));
+planeFront.position.z = 50;
+planeFront.position.y = 50;
+planeFront.rotateY(Math.PI);
+scene.add(planeFront);
+
+const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+planeRight.position.x = 50;
+planeRight.position.y = 50;
+planeRight.rotateY(- Math.PI / 2);
+scene.add(planeRight);
+
+const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+planeLeft.position.x = - 50;
+planeLeft.position.y = 50;
+planeLeft.rotateY(Math.PI / 2);
+scene.add(planeLeft);
+
+// lights
+const mainLight = new THREE.PointLight(0xcccccc, 1.5, 250);
+mainLight.position.y = 60;
+scene.add(mainLight);
+
+const greenLight = new THREE.PointLight(0x00ff00, 0.25, 1000);
+greenLight.position.set(550, 50, 0);
+scene.add(greenLight);
+
+const redLight = new THREE.PointLight(0xff0000, 0.25, 1000);
+redLight.position.set(- 550, 50, 0);
+scene.add(redLight);
+
+const blueLight = new THREE.PointLight(0x7f7fff, 0.25, 1000);
+blueLight.position.set(0, 50, 550);
+scene.add(blueLight);
 
 // Main Render Loop
 const clock = new THREE.Clock();
@@ -56,12 +122,19 @@ function animate() {
         currentVrm.update(clock.getDelta());
     }
 
-    renderer.render(scene, orbitCamera);
+    renderer.render(scene, camera);
 }
 animate();
 
 document.body.appendChild(VRButton.createButton(renderer));
 renderer.xr.enabled = true;
+
+document.getElementById("VRButton").addEventListener('click', () => {
+    var selectedObject = scene.getObjectByName(mainUserSocketID);
+    camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
+    camera.y += 1.0; // Move a little away from the face.
+    selectedObject.add(camera);
+});
 
 /* VRM CHARACTER SETUP */
 // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
@@ -81,6 +154,10 @@ loadUser = function (socketID, modelURL) {
             THREE.VRM.from(gltf).then(vrm => {
                 let object = vrm.scene;
                 object.name = socketID;
+
+                object.scale.set( 3, 3, 3 );
+                object.position.y = 0.5;
+                object.position.z = -25.0;
                 scene.add(object);
 
                 virtualModels[socketID] = {};
@@ -88,8 +165,8 @@ loadUser = function (socketID, modelURL) {
                 virtualModels[socketID].vrm = vrm;
 
                 vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                vrm.scene.position.x = xPosition++;
-                // vrm.scene.position.z = zPosition;
+                vrm.scene.position.x = xPosition;
+                xPosition += 3.0;
 
                 updateCamera();
             });
@@ -297,30 +374,24 @@ removeModel = (sID) => {
     scene.remove(selectedObject);
 
     if (xPosition > 0) {
-        xPosition--;
+        xPosition -= 3.0;
     }
 
-    updateCamera(true);
+    updateCamera(true, sID);
 }
 
-var updateCamera = (remove) => {
+var updateCamera = (remove, sID) => {
     if (remove) {
-        cameraXPosition -= 0.35;
-        cameraZPosition -= 0.5;
+        cameraXPosition -= 0.25;
+        cameraZPosition -= 0.25;
     } else {
-        cameraXPosition += 0.35;
-        cameraZPosition += 0.5;
+        cameraXPosition += 0.25;
+        cameraZPosition += 0.25;
     }
 
     // camera
-    orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-    orbitCamera.position.set(cameraXPosition, 1.0, cameraZPosition);
-
-    // controls
-    orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
-    orbitControls.screenSpacePanning = true;
-    orbitControls.target.set(cameraXPosition, 1.0, 2.0);
-    orbitControls.update();
+    // orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // orbitCamera.position.set(cameraXPosition, 1.0, cameraZPosition);
 
     animate();
 }

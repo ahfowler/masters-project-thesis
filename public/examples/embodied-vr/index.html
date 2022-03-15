@@ -39,6 +39,29 @@
     <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
 
     <link rel="stylesheet" href="./index.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var modelName = "";
+        var socketID;
+
+        socket.on("sendMainUserDetails", (classroomSocketID) => {
+            let userName = document.getElementById("name-input").value;
+            console.log("Main User: " + socketID, "Classroom: " + classroomSocketID);
+            socket.emit("sendMainVRMModel", vrmURL, userName, socketID, classroomSocketID); // Send to the classroom that you're the main character.
+            socket.emit("sendVRMModel", vrmURL, userName, socketID, classroomSocketID); // Send model details to everyone.
+        });
+
+        socket.on('recievedSocketID', (sID) => {
+            socketID = sID;
+
+            let userName = document.getElementById("name-input").value;
+
+            window.open("./kalidokit.html", '_blank', 'location=yes,height=864,width=1152,scrollbars=no,status=yes'); // Open a new window for the classroom.
+
+
+        });
+    </script>
 </head>
 
 <body>
@@ -72,16 +95,11 @@
                 </div>
             </div>
 
-            <a target="_blank" rel="noopener noreferrer" onclick="sendModel()">Enter</a>
+            <a id="enter-button" onclick="sendModel()">Enter</a>
         </div>
         <!-- <script src="./mediapipe-support/initialize.js"></script>
         <script src="./mediapipe-support/gesturesLibrary.js"></script>
         <script src="./mediapipe-support/interactionsLibrary.js"></script> -->
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-            var socket = io();
-            var modelName = "";
-        </script>
         <script src="./index.js"></script>
 </body>
 

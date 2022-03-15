@@ -113,6 +113,7 @@ body {
   text-align: center;
   display: flex;
   flex-direction: column;
+  margin-bottom: 30px;
 }
 
 .character-box > div {
@@ -121,5 +122,11 @@ body {
   background-position: center;
   background-size: cover;
   margin: 10px;
+  cursor: pointer;
+}
+
+#enter-button {
+  border: 1px #000 solid;
+  padding: 5px 10px;
   cursor: pointer;
 }
