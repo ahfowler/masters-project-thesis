@@ -55,12 +55,12 @@ export class MediaPipe {
         this.holisticSettings.setOptions({
             selfieMode: true,
             modelComplexity: 1,
-            smoothLandmarks: true,
-            enableSegmentation: false,
-            smoothSegmentation: true,
-            minDetectionConfidence: 0.5,
+            minDetectionConfidence: 0.8,
             minTrackingConfidence: 0.8,
-            effect: 'background',
+            smoothLandmarks: true,
+            smoothSegmentation: true,
+            refineFaceLandmarks: true,
+            enableSegmentation: true
         });
 
         this.holisticSettings.onResults();

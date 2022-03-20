@@ -187,7 +187,7 @@ export class Gesture {
         }
     }
 
-    // Landmark Point Styles --------------------------------------------------------------------------
+    // Landmark Styles --------------------------------------------------------------------------
     styleFaceLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
         console.log("Styling left hand landmarks...");
         if (this.mediapipe) {
@@ -223,7 +223,7 @@ export class Gesture {
             }, 1000);
         }
     }
-    
+
     styleLeftHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
         console.log("Styling left hand landmarks...");
         if (this.mediapipe) {
@@ -258,5 +258,35 @@ export class Gesture {
                 }
             }, 1000);
         }
+    }
+
+    // Miscellaneous Settings -------------------------------------------------------------------
+    showCamera() {
+        console.log("Showing camera...");
+        if (document.getElementById("input-video")) {
+            let inputVideo = document.getElementById("input-video");
+            inputVideo.style.display = "block";
+            inputVideo.style.position = "fixed";
+            inputVideo.style.zIndex = -100;
+            inputVideo.style.height = "100%";
+            inputVideo.style.width = "100%";
+        } else {
+            // Wait until #input-video has loaded.
+            let checkCamera = setInterval(function () {
+                if (document.getElementById("input-video")) {
+                    console.log("#input-video has loaded...");
+                    clearInterval(checkCamera);
+                    let inputVideo = document.getElementById("input-video");
+                    inputVideo.style.display = "block";
+                    inputVideo.style.position = "fixed";
+                    inputVideo.style.zIndex = -100;
+                    inputVideo.style.height = "100%";
+                    inputVideo.style.width = "100%";
+                } else {
+                    console.log("#input-video still loading...");
+                }
+            }, 1000);
+        }
+
     }
 }
