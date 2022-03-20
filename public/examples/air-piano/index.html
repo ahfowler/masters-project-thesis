@@ -13,6 +13,8 @@
     <!-- Download Gesture CSS Stylesheet -->
     <link rel="stylesheet" href="../../src/css/gesture.css">
 
+    <!-- Example-Specific Imports -->
+    <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
@@ -23,13 +25,24 @@
     <script type="module">
         import { Gesture } from "../../src/js/gesture.js";
 
+        // Step 1: Import and initialize Gesture.js
         var gesture = new Gesture();
         gesture.gesturize("example-application");
 
+        // Step 2: Add functions to body parts.
         // Add a function that runs whenever left hand appears on camera.
         gesture.onLeftHand(() => {
             console.log("Left hand detected!");
         });
+        // Add a function that runs whenever right hand appears on camera.
+        gesture.onRightHand(() => {
+            console.log("Right hand detected!");
+        });
+
+        gesture.styleLeftHandLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
+        gesture.styleRightHandLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
+        gesture.stylePoseLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
+        gesture.styleFaceLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
 
     </script>
 </body>

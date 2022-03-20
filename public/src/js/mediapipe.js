@@ -24,7 +24,12 @@ export class MediaPipe {
     _leftHandLandmarksCallback;
     _rightHandLandmarksCallback;
 
-    
+    _faceLandmarksStyling;
+    _poseLandmarksStyling;
+    _leftHandLandmarksStyling;
+    _rightHandLandmarksStyling;
+
+
 
     constructor(video, canvas) {
         // Step 1: Assign video and canvas elements.
@@ -74,12 +79,12 @@ export class MediaPipe {
 
     async onResults(results) {
         if (!this.videoLoaded) {
-            this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
+            // this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
             this.videoLoaded = true;
         }
 
         // Collect the results.
-        this.predictions = await this.model.estimateHands(document.querySelector("video"), false);
+        // this.predictions = await this.model.estimateHands(document.querySelector("video"), false);
         this.mpResults = results;
 
         const faceLandmarks = results.faceLandmarks;
@@ -91,38 +96,123 @@ export class MediaPipe {
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
-        if (faceLandmarks && this._faceLandmarksCallback) {
-           this._faceLandmarksCallback();
+        if (faceLandmarks) {
+            if (this._faceLandmarksStyling) {
+                this._faceLandmarksStyling(results);
+            }
+
+            if (this._faceLandmarksCallback) {
+                this._faceLandmarksCallback();
+            }
         }
 
-        if (pose3DLandmarks && pose2DLandmarks && this._poseLandmarksCallback) {
-            this._poseLandmarksCallback();
+        if (pose3DLandmarks && pose2DLandmarks) {
+            if (this._poseLandmarksStyling) {
+                this._poseLandmarksStyling(results);
+            }
+
+            if (this._poseLandmarksCallback) {
+                this._poseLandmarksCallback();
+            }
         }
 
-        if (leftHandLandmarks && this._leftHandLandmarksCallback) {
-           this._leftHandLandmarksCallback();
+        if (leftHandLandmarks) {
+            if (this._leftHandLandmarksStyling) {
+                this._leftHandLandmarksStyling(results);
+            }
+
+            if (this._leftHandLandmarksCallback) {
+                this._leftHandLandmarksCallback();
+            }
+
         }
 
-        if (rightHandLandmarks && this._rightHandLandmarksCallback) {
-            this._rightHandLandmarksCallback();
+        if (rightHandLandmarks) {
+            if (this._rightHandLandmarksStyling) {
+                this._rightHandLandmarksStyling(results);
+            }
+
+            if (this._rightHandLandmarksCallback) {
+                this._rightHandLandmarksCallback();
+            }
         }
 
         this.canvasCtx.restore();
     }
 
-    onFace(callback) {
-        this._faceLandmarksCallback = callback;
+    styleFaceLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        let styleFunction = function (results) {
+            this.drawingUtils.drawConnectors(this.canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
+                color: connectorColor ? connectorColor : "transparent",
+                lineWidth: connectorWidth ? connectorWidth : 0
+            });
+
+            this.drawingUtils.drawLandmarks(this.canvasCtx, results.faceLandmarks, {
+                color: borderColor ? borderColor : "transparent",
+                fillColor: fillColor ? fillColor : "transparent",
+                lineWidth: borderWidth ? borderWidth : 0,
+                radius: (data) => {
+                    return this.drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
+                }
+            });
+        };
+        this._faceLandmarksStyling = styleFunction;
     }
 
-    onPose(callback) {
-        this._poseLandmarksCallback = callback;
+    stylePoseLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        let styleFunction = function (results) {
+            this.drawingUtils.drawConnectors(this.canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+                color: connectorColor ? connectorColor : "transparent",
+                lineWidth: connectorWidth ? connectorWidth : 0
+            });
+
+            this.drawingUtils.drawLandmarks(this.canvasCtx, results.poseLandmarks, {
+                color: borderColor ? borderColor : "transparent",
+                fillColor: fillColor ? fillColor : "transparent",
+                lineWidth: borderWidth ? borderWidth : 0,
+                radius: (data) => {
+                    return this.drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
+                }
+            });
+        };
+        this._poseLandmarksStyling = styleFunction;
     }
 
-    onLeftHand(callback) {
-        this._leftHandLandmarksCallback = callback;
+    styleLeftHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        let styleFunction = function (results) {
+            this.drawingUtils.drawConnectors(this.canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
+                color: connectorColor ? connectorColor : "transparent",
+                lineWidth: connectorWidth ? connectorWidth : 0
+            });
+
+            this.drawingUtils.drawLandmarks(this.canvasCtx, results.rightHandLandmarks, {
+                color: borderColor ? borderColor : "transparent",
+                fillColor: fillColor ? fillColor : "transparent",
+                lineWidth: borderWidth ? borderWidth : 0,
+                radius: (data) => {
+                    return this.drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
+                }
+            });
+        };
+        this._leftHandLandmarksStyling = styleFunction;
     }
 
-    onRightHand(callback) {
-        this._rightHandLandmarksCallback = callback;
+    styleRightHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        let styleFunction = function (results) {
+            this.drawingUtils.drawConnectors(this.canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
+                color: connectorColor ? connectorColor : "transparent",
+                lineWidth: connectorWidth ? connectorWidth : 0
+            });
+
+            this.drawingUtils.drawLandmarks(this.canvasCtx, results.leftHandLandmarks, {
+                color: borderColor,
+                fillColor: fillColor,
+                lineWidth: borderWidth,
+                radius: (data) => {
+                    return this.drawingUtils.lerp(data.from.z, -0.15, .1, 10, 1);
+                }
+            });
+        };
+        this._rightHandLandmarksStyling = styleFunction;
     }
 }

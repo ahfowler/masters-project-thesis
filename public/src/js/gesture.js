@@ -27,8 +27,6 @@ export class Gesture {
     cursor; // Reference for the user's cursor.
     mediapipe; // Reference to MediaPipe engine.
 
-    loaded;
-
     constructor() { // Default constructor.
         // Step 1: Assign UUIDs to all the elements on the DOM for easy access.
         var allElements = document.getElementsByTagName("*"); // Get all the elements on the DOM.
@@ -49,7 +47,7 @@ export class Gesture {
         return result ? result[0] : null; // or undefined
     }
 
-    // ---------------------------------------- Methods ----------------------------------------
+    // ---------------------------------------- Client Methods ----------------------------------------
 
     // Create a default MediaPipe enviroment.
     async gesturize(applicationElementID) {
@@ -78,7 +76,7 @@ export class Gesture {
             script.crossOrigin = "anonymous";
 
             script.onload = function () {
-                loadedCDNS++;
+                loadedCDNS += 1;
             };
 
             head.appendChild(script);
@@ -111,24 +109,25 @@ export class Gesture {
                     this.mediapipe.onResults(results);
                 });
             } else {
-                console.log("CDNs still loading...", this.loaded);
+                console.log("CDNs still loading...");
             }
         }, 1000);
     }
 
+    // Body Part Detections ---------------------------------------------------------------------------
     onFace(callback) {
         console.log("Setting onFace()...");
         if (this.mediapipe) {
-            this.mediapipe.onFace(callback);
+            this.mediapipe._faceLandmarksCallback = callback;
         } else {
             // Wait until MediaPipe has loaded.
             let checkMediaPipe = setInterval(function () {
                 if (this.mediapipe) {
                     console.log("MediaPipe has loaded...");
                     clearInterval(checkMediaPipe);
-                    this.mediapipe.onFace(callback);
+                    this.mediapipe._faceLandmarksCallback = callback;
                 } else {
-                    console.log("MediaPipe still loading...", this.loaded);
+                    console.log("MediaPipe still loading...");
                 }
             }, 1000);
         }
@@ -137,16 +136,16 @@ export class Gesture {
     onPose(callback) {
         console.log("Setting onPose()...");
         if (this.mediapipe) {
-            this.mediapipe.onPose(callback);
+            this.mediapipe._poseLandmarksCallback = callback;
         } else {
             // Wait until MediaPipe has loaded.
             let checkMediaPipe = setInterval(function () {
                 if (this.mediapipe) {
                     console.log("MediaPipe has loaded...");
                     clearInterval(checkMediaPipe);
-                    this.mediapipe.onPose(callback);
+                    this.mediapipe._poseLandmarksCallback = callback;
                 } else {
-                    console.log("MediaPipe still loading...", this.loaded);
+                    console.log("MediaPipe still loading...");
                 }
             }, 1000);
         }
@@ -155,16 +154,16 @@ export class Gesture {
     onLeftHand(callback) {
         console.log("Setting onLeftHand()...");
         if (this.mediapipe) {
-            this.mediapipe.onLeftHand(callback);
+            this.mediapipe._leftHandLandmarksCallback = callback;
         } else {
             // Wait until MediaPipe has loaded.
             let checkMediaPipe = setInterval(function () {
                 if (this.mediapipe) {
                     console.log("MediaPipe has loaded...");
                     clearInterval(checkMediaPipe);
-                    this.mediapipe.onLeftHand(callback);
+                    this.mediapipe._leftHandLandmarksCallback = callback;
                 } else {
-                    console.log("MediaPipe still loading...", this.loaded);
+                    console.log("MediaPipe still loading...");
                 }
             }, 1000);
         }
@@ -173,16 +172,89 @@ export class Gesture {
     onRightHand(callback) {
         console.log("Setting onRightHand()...");
         if (this.mediapipe) {
-            this.mediapipe.onRightHand(callback);
+            this.mediapipe._rightHandLandmarksCallback = callback;
         } else {
             // Wait until MediaPipe has loaded.
             let checkMediaPipe = setInterval(function () {
                 if (this.mediapipe) {
                     console.log("MediaPipe has loaded...");
                     clearInterval(checkMediaPipe);
-                    this.mediapipe.onRightHand(callback);
+                    this.mediapipe._rightHandLandmarksCallback = callback;
                 } else {
-                    console.log("MediaPipe still loading...", this.loaded);
+                    console.log("MediaPipe still loading...");
+                }
+            }, 1000);
+        }
+    }
+
+    // Landmark Point Styles --------------------------------------------------------------------------
+    styleFaceLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        console.log("Styling left hand landmarks...");
+        if (this.mediapipe) {
+            this.mediapipe.styleFaceLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+        } else {
+            // Wait until MediaPipe has loaded.
+            let checkMediaPipe = setInterval(function () {
+                if (this.mediapipe) {
+                    console.log("MediaPipe has loaded...");
+                    clearInterval(checkMediaPipe);
+                    this.mediapipe.styleFaceLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+                } else {
+                    console.log("MediaPipe still loading...");
+                }
+            }, 1000);
+        }
+    }
+
+    stylePoseLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        console.log("Styling pose landmarks...");
+        if (this.mediapipe) {
+            this.mediapipe.stylePoseLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+        } else {
+            // Wait until MediaPipe has loaded.
+            let checkMediaPipe = setInterval(function () {
+                if (this.mediapipe) {
+                    console.log("MediaPipe has loaded...");
+                    clearInterval(checkMediaPipe);
+                    this.mediapipe.stylePoseLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+                } else {
+                    console.log("MediaPipe still loading...");
+                }
+            }, 1000);
+        }
+    }
+    
+    styleLeftHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        console.log("Styling left hand landmarks...");
+        if (this.mediapipe) {
+            this.mediapipe.styleLeftHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+        } else {
+            // Wait until MediaPipe has loaded.
+            let checkMediaPipe = setInterval(function () {
+                if (this.mediapipe) {
+                    console.log("MediaPipe has loaded...");
+                    clearInterval(checkMediaPipe);
+                    this.mediapipe.styleLeftHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+                } else {
+                    console.log("MediaPipe still loading...");
+                }
+            }, 1000);
+        }
+    }
+
+    styleRightHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth) {
+        console.log("Styling right hand landmarks...");
+        if (this.mediapipe) {
+            this.mediapipe.styleRightHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+        } else {
+            // Wait until MediaPipe has loaded.
+            let checkMediaPipe = setInterval(function () {
+                if (this.mediapipe) {
+                    console.log("MediaPipe has loaded...");
+                    clearInterval(checkMediaPipe);
+                    this.mediapipe.styleRightHandLandmarks(fillColor, borderColor, borderWidth, connectorColor, connectorWidth);
+                } else {
+                    console.log("MediaPipe still loading...");
                 }
             }, 1000);
         }
