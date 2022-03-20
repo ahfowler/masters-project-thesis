@@ -172,7 +172,7 @@ loadUser = function (socketID, modelURL) {
                 updateCamera();
             });
         },
-
+ 
         progress =>
             console.log(
                 "Loading model...",

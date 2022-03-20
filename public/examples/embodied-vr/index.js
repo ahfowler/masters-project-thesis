@@ -177,7 +177,7 @@ videoElement.classList.add('selfie');
 camera.start();
 
 function chooseModel(modelName) {
-    vrmURL = "./vrm-models/" + modelName + ".vrm";
+    vrmURL = "../../assets/vrm-models/" + modelName + ".vrm";
     document.getElementById(modelName).style.border = "2px solid black";
 
     let otherCharacters = document.getElementsByClassName("character-box");

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gesture.js Examples</title>
+    <meta charset="utf-8">
+
+    <!-- Download UUID Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
+        integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Download Gesture CSS Stylesheet -->
+    <link rel="stylesheet" href="../../src/css/gesture.css">
+
+</head>
+
+<body>
+    <div id="example-application">
+        <p>Welcome! This page is under construction.</p>
+    </div>
+
+    <script type="module">
+        import { Gesture } from "../../src/js/gesture.js";
+
+        var gesture = new Gesture();
+        gesture.gesturize("example-application");
+
+        // Add a function that runs whenever left hand appears on camera.
+        gesture.onLeftHand(() => {
+            console.log("Left hand detected!");
+        });
+
+    </script>
+</body>
+
+</html>
