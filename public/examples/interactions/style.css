@@ -6,115 +6,39 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-
-  width: 100%;
-
-  position: static;
-  top: 0;
-
-  margin: 0;
-
-  background-color: #101c2a;
-}
-
-.container {
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-  position: relative;
-  top: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-direction: column;
-}
-
-.input_video {
-  display: none;
-  position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.handsfree-debugger {
-  display: none;
-}
-
-.input_video.selfie {
-  transform: scale(-1, 1);
-}
-
-.canvas-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 100%;
-  width: 100%;
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  z-index: 1;
-}
-
-.output_canvas {
-  display: block;
-
-  width: 100%;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-
-  z-index: 1;
-
-  background-color: transparent;
-}
-
 /* Application Styles */
+
+body {
+  margin: 0;
+}
 
 #example-application {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   width: 100%;
-
   margin: 0;
-
   position: relative;
   /* left: 0;
   right: 0; */
   top: 0;
   /* bottom: 0; */
-
   background-color: #101c2a;
   color: #49a0c5;
   font-family: 'Inconsolata', monospace;
 }
 
-#example-application > #landing-page {
+#example-application>#landing-page {
   text-align: center;
-  height: 30vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: all 1s linear;
 }
 
-#example-application> #landing-page > h1 {
+#example-application>#landing-page>h1 {
   padding-top: 20vh;
 
   color: #49a0c5;
@@ -125,7 +49,7 @@ body {
   margin-block-end: 0.2em;
 }
 
-#example-application> #landing-page > p {
+#example-application>#landing-page>p {
   color: #49a0c5;
   font-family: 'Inconsolata', monospace;
   font-size: 13px;
@@ -151,7 +75,7 @@ body {
   margin-block-start: 0.2em;
   margin-block-end: 0.2em;
 
-  margin-top: 30vh;
+  margin-top: 10vh;
 }
 
 #example-application>#demo>p {
@@ -277,6 +201,28 @@ body {
   color: #36536d;
 }
 
-#example-application>#demo>#gesture-interaction-boxes>.gesture-box > p {
+#example-application>#demo>#gesture-interaction-boxes>.gesture-box>p {
   font-size: 30px;
+}
+
+.scroll-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px #49a0c550 solid;
+  border-radius: 100%;
+  height: 4vw;
+  width: 4vw;
+}
+
+.arrow {
+  box-sizing: border-box;
+  height: 1vw;
+  width: 1vw;
+  margin-bottom: 0.5vw;
+  border-style: solid;
+  border-color: #49a0c550;
+  border-width: 0px 3px 3px 0px;
+  transform: rotate(45deg);
+  transition: border-width 150ms ease-in-out;
 }

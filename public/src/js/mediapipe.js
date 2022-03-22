@@ -1,3 +1,5 @@
+import { LANDMARK_AREAS, LANDMARK_NAMES, LANDMARK_POINTS } from '../js/global.js'
+
 export class MediaPipe {
     // Important DOM Elements...
     videoElement;
@@ -5,8 +7,8 @@ export class MediaPipe {
     canvasCtx;
 
     // MediaPipe Holisitic Variables...
-    mpHolistic;
-    holisticSettings;
+    mpHolistic = window;
+    holisticSettings = window;
 
     // Tensor Flow HandPose Variables...
     model;
@@ -16,6 +18,7 @@ export class MediaPipe {
     camera;
     drawingUtils;
     videoLoaded = false;
+    _onLoadCallback;
 
     // The Good Stuff!
     mpResults; // Holistic Landmarks
@@ -24,12 +27,12 @@ export class MediaPipe {
     _leftHandLandmarksCallback;
     _rightHandLandmarksCallback;
 
+    _onHandLandmarksCallback;
+
     _faceLandmarksStyling;
     _poseLandmarksStyling;
     _leftHandLandmarksStyling;
     _rightHandLandmarksStyling;
-
-
 
     constructor(video, canvas) {
         // Step 1: Assign video and canvas elements.
@@ -79,12 +82,13 @@ export class MediaPipe {
 
     async onResults(results) {
         if (!this.videoLoaded) {
-            // this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
+            this._onLoadCallback();
+            this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
             this.videoLoaded = true;
         }
 
         // Collect the results.
-        // this.predictions = await this.model.estimateHands(document.querySelector("video"), false);
+        this.predictions = await this.model.estimateHands(document.querySelector("video"), false);
         this.mpResults = results;
 
         const faceLandmarks = results.faceLandmarks;
@@ -96,7 +100,7 @@ export class MediaPipe {
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
-        if (faceLandmarks) {
+        if (faceLandmarks) { // If we see face data...
             if (this._faceLandmarksStyling) {
                 this._faceLandmarksStyling(results);
             }
@@ -106,7 +110,7 @@ export class MediaPipe {
             }
         }
 
-        if (pose3DLandmarks && pose2DLandmarks) {
+        if (pose3DLandmarks && pose2DLandmarks) { // If we see pose data...
             if (this._poseLandmarksStyling) {
                 this._poseLandmarksStyling(results);
             }
@@ -116,24 +120,32 @@ export class MediaPipe {
             }
         }
 
-        if (leftHandLandmarks) {
+        if (leftHandLandmarks || rightHandLandmarks) { // If we see any hand data...
+
             if (this._leftHandLandmarksStyling) {
                 this._leftHandLandmarksStyling(results);
             }
 
-            if (this._leftHandLandmarksCallback) {
-                this._leftHandLandmarksCallback();
-            }
-
-        }
-
-        if (rightHandLandmarks) {
             if (this._rightHandLandmarksStyling) {
                 this._rightHandLandmarksStyling(results);
             }
 
-            if (this._rightHandLandmarksCallback) {
-                this._rightHandLandmarksCallback();
+            if (leftHandLandmarks || rightHandLandmarks) { // If we see both hands data...
+                if (this._onHandLandmarksCallback) {
+                    this._onHandLandmarksCallback();
+                }
+            }
+            
+            if (leftHandLandmarks) { // If we see left hands data...
+                if (this._leftHandLandmarksCallback) {
+                    this._leftHandLandmarksCallback();
+                }
+            }
+            
+            if (rightHandLandmarks) { // If we see right hands data...
+                if (this._rightHandLandmarksCallback) {
+                    this._rightHandLandmarksCallback();
+                }
             }
         }
 
@@ -214,5 +226,9 @@ export class MediaPipe {
             });
         };
         this._rightHandLandmarksStyling = styleFunction;
+    }
+
+    onLoad(callback) {
+        this._onLoadCallback = callback;
     }
 }

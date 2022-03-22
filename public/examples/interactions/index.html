@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>MediaPipe Desktop Application</title>
+    <title>Gesture.js | Interactions Example</title>
     <meta charset="utf-8">
 
     <!-- Download JQuery -->
@@ -35,119 +35,284 @@
         integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <!-- Download Gesture CSS Stylesheet -->
+    <link rel="stylesheet" href="../../src/css/gesture.css">
+
+    <!-- Example-Specific Imports -->
     <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <div class="container">
-        <video class="input_video"></video>
-        <div class="canvas-container">
-            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"></canvas>
-        </div>
-        <div id="example-application">
-            <div id="landing-page">
-                <h1>Gesture.js</h1>
-                <p>A lightweight Javascript framework for creating immersive and embodied experiences on the web.</p>
-                <br />
-                <p id="loading-text">Loading...</p>
-            </div>
-
-            <div id="demo" style="opacity: 0;">
-                <h2>Touch any element on the DOM with any part of your body.</h2>
-                <p>Try playing the piano with your fingertips.</p>
-                <div id="hover-interaction-boxes" class="box-collection">
-                    <div id="white-keys">
-                        <div class="key">
-                            <p>C</p>
-                        </div>
-                        <div class="key">
-                            <p>D</p>
-                        </div>
-                        <div class="key">
-                            <p>E</p>
-                        </div>
-                        <div class="key">
-                            <p>F</p>
-                        </div>
-                        <div class="key">
-                            <p>G</p>
-                        </div>
-                        <div class="key">
-                            <p>A</p>
-                        </div>
-                        <div class="key">
-                            <p>B</p>
-                        </div>
-                        <div class="key">
-                            <p>C</p>
-                        </div>
-                        <div class="key">
-                            <p>D</p>
-                        </div>
-                    </div>
-                    <div id="black-keys">
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key"></div>
-                        <div class="key invisible"></div>
-                        <div class="key invisible"></div>
-                    </div>
-                </div>
-
-                <br />
-
-                <h2>Manipulate elements on the DOM with any gesture.</h2>
-                <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target
-                    area.</p>
-                <div id="drag-interaction-boxes" class="box-collection">
-                    <div class="target-box">Begin</div>
-                    <div class="target-box">End</div>
-                    <div id="box"></div>
-                </div>
-
-                <br />
-
-                <h2>Identify any gesture.</h2>
-                <p>Try making any of the gestures below and see it light up.</p>
-                <p>You made the <span id="gesture-name"></span> gesture!</p>
-                <div id="gesture-interaction-boxes" class="box-collection">
-                    <div class="gesture-box">
-                        Zero
-                    </div>
-                    <div class="gesture-box">
-                        One
-                    </div>
-                    <div class="gesture-box">
-                        Two
-                    </div>
-                    <div class="gesture-box">
-                        Three
-                    </div>
-                    <div class="gesture-box">
-                        Four
-                    </div>
-                    <div class="gesture-box">
-                        Five
-                    </div>
-                </div>
-            </div>
+    <div id="example-application">
+        <div id="landing-page">
+            <p id="loading-text">Loading...</p>
         </div>
 
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-            var socket = io();
-        </script>
+        <div id="demo" style="opacity: 0;">
+            <h2>Touch any element on the DOM with any part of your body.</h2>
+            <p>Try playing the piano with your fingertips.</p>
+            <div id="hover-interaction-boxes" class="box-collection">
+                <div id="white-keys">
+                    <div class="key">
+                        <p>C</p>
+                    </div>
+                    <div class="key">
+                        <p>D</p>
+                    </div>
+                    <div class="key">
+                        <p>E</p>
+                    </div>
+                    <div class="key">
+                        <p>F</p>
+                    </div>
+                    <div class="key">
+                        <p>G</p>
+                    </div>
+                    <div class="key">
+                        <p>A</p>
+                    </div>
+                    <div class="key">
+                        <p>B</p>
+                    </div>
+                    <div class="key">
+                        <p>C</p>
+                    </div>
+                    <div class="key">
+                        <p>D</p>
+                    </div>
+                </div>
+                <div id="black-keys">
+                    <div class="key invisible"></div>
+                    <div class="key"></div>
+                    <div class="key"></div>
+                    <div class="key invisible"></div>
+                    <div class="key"></div>
+                    <div class="key"></div>
+                    <div class="key"></div>
+                    <div class="key invisible"></div>
+                    <div class="key"></div>
+                    <div class="key invisible"></div>
+                    <div class="key invisible"></div>
+                </div>
+            </div>
 
-        <script src="../../src/js/initialize.js"></script>
-        <script src="../../src/js/gesturesLibrary.js"></script>
-        <script src="../../src/js/interactionsLibrary.js"></script>
-        <script src="./mediapipe.js"></script>
+            <div class="scroll-button" onclick="scrollToSection('box-drag')">
+                <div class="arrow bounce">
+                </div>
+            </div>
+
+            <br />
+
+            <h2 id="box-drag">Manipulate elements on the DOM with any gesture.</h2>
+            <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target
+                area.</p>
+            <div id="drag-interaction-boxes" class="box-collection">
+                <div class="target-box">Begin</div>
+                <div class="target-box">End</div>
+                <div id="box"></div>
+            </div>
+
+            <div class="scroll-button" onclick="scrollToSection('gestures')">
+                <div class="arrow bounce">
+                </div>
+            </div>
+
+            <br />
+
+            <h2 id="gestures">Identify any gesture.</h2>
+            <p>Try making any of the gestures below and see it light up.</p>
+            <p>You made the <span id="gesture-name"></span> gesture!</p>
+            <div id="gesture-interaction-boxes" class="box-collection">
+                <div class="gesture-box">
+                    Zero
+                </div>
+                <div class="gesture-box">
+                    One
+                </div>
+                <div class="gesture-box">
+                    Two
+                </div>
+                <div class="gesture-box">
+                    Three
+                </div>
+                <div class="gesture-box">
+                    Four
+                </div>
+                <div class="gesture-box">
+                    Five
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Gesture } from "../../src/js/gesture.js";
+        import { LANDMARK_AREAS, LANDMARK_NAMES, LANDMARK_POINTS } from '../../src/js/global.js'
+
+        // Step 1: Import and initialize Gesture.js
+        var gesture = new Gesture("example-application");
+        gesture.onLoad(() => {
+            document.getElementById("demo").style.opacity = 1;
+            document.getElementById("landing-page").style.height = "10vh";
+            document.getElementById("loading-text").innerHTML = "Wave your hands!";
+        });
+
+        // Step 2: Style landmark points.
+        gesture.styleLeftHandLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
+        gesture.styleRightHandLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
+
+        // Step 3: Create your experience!
+        var synths = [];
+
+        var boxCollections = document.getElementsByClassName("box-collection");
+
+        let whiteKeyNotes = ["C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4"];
+        let whiteNotePlaying = [false, false, false, false, false, false, false, false, false];
+        let whiteKeys = document.getElementById("white-keys").children;
+
+        let blackKeyNotes = [null, "C#3", "D#3", null, "F#3", "G#3", "A#3", null, "C#4", null, null];
+        let blackNotePlaying = [false, false, false, false, false, false, false, false, false, false, false];
+        let blackKeys = document.getElementById("black-keys").children;
+
+        for (var i = 0; i < (whiteKeys.length + blackKeys.length); i++) {
+            let baseURL = "../../assets/samples/piano/";
+            let synth = new Tone.Sampler({
+                'A0': baseURL + 'A0.[mp3|ogg]',
+                'A1': baseURL + 'A1.[mp3|ogg]',
+                'A2': baseURL + 'A2.[mp3|ogg]',
+                'A3': baseURL + 'A3.[mp3|ogg]',
+                'A4': baseURL + 'A4.[mp3|ogg]',
+                'A5': baseURL + 'A5.[mp3|ogg]',
+                'A6': baseURL + 'A6.[mp3|ogg]',
+                'A#0': baseURL + 'As0.[mp3|ogg]',
+                'A#1': baseURL + 'As1.[mp3|ogg]',
+                'A#2': baseURL + 'As2.[mp3|ogg]',
+                'A#3': baseURL + 'As3.[mp3|ogg]',
+                'A#4': baseURL + 'As4.[mp3|ogg]',
+                'A#5': baseURL + 'As5.[mp3|ogg]',
+                'A#6': baseURL + 'As6.[mp3|ogg]',
+                'B0': baseURL + 'B0.[mp3|ogg]',
+                'B1': baseURL + 'B1.[mp3|ogg]',
+                'B2': baseURL + 'B2.[mp3|ogg]',
+                'B3': baseURL + 'B3.[mp3|ogg]',
+                'B4': baseURL + 'B4.[mp3|ogg]',
+                'B5': baseURL + 'B5.[mp3|ogg]',
+                'B6': baseURL + 'B6.[mp3|ogg]',
+                'C0': baseURL + 'C0.[mp3|ogg]',
+                'C1': baseURL + 'C1.[mp3|ogg]',
+                'C2': baseURL + 'C2.[mp3|ogg]',
+                'C3': baseURL + 'C3.[mp3|ogg]',
+                'C4': baseURL + 'C4.[mp3|ogg]',
+                'C5': baseURL + 'C5.[mp3|ogg]',
+                'C6': baseURL + 'C6.[mp3|ogg]',
+                'C7': baseURL + 'C7.[mp3|ogg]',
+                'C#0': baseURL + 'Cs0.[mp3|ogg]',
+                'C#1': baseURL + 'Cs1.[mp3|ogg]',
+                'C#2': baseURL + 'Cs2.[mp3|ogg]',
+                'C#3': baseURL + 'Cs3.[mp3|ogg]',
+                'C#4': baseURL + 'Cs4.[mp3|ogg]',
+                'C#5': baseURL + 'Cs5.[mp3|ogg]',
+                'C#6': baseURL + 'Cs6.[mp3|ogg]',
+                'D0': baseURL + 'D0.[mp3|ogg]',
+                'D1': baseURL + 'D1.[mp3|ogg]',
+                'D2': baseURL + 'D2.[mp3|ogg]',
+                'D3': baseURL + 'D3.[mp3|ogg]',
+                'D4': baseURL + 'D4.[mp3|ogg]',
+                'D5': baseURL + 'D5.[mp3|ogg]',
+                'D6': baseURL + 'D6.[mp3|ogg]',
+                'D#0': baseURL + 'Ds0.[mp3|ogg]',
+                'D#1': baseURL + 'Ds1.[mp3|ogg]',
+                'D#2': baseURL + 'Ds2.[mp3|ogg]',
+                'D#3': baseURL + 'Ds3.[mp3|ogg]',
+                'D#4': baseURL + 'Ds4.[mp3|ogg]',
+                'D#5': baseURL + 'Ds5.[mp3|ogg]',
+                'D#6': baseURL + 'Ds6.[mp3|ogg]',
+                'E0': baseURL + 'E0.[mp3|ogg]',
+                'E1': baseURL + 'E1.[mp3|ogg]',
+                'E2': baseURL + 'E2.[mp3|ogg]',
+                'E3': baseURL + 'E3.[mp3|ogg]',
+                'E4': baseURL + 'E4.[mp3|ogg]',
+                'E5': baseURL + 'E5.[mp3|ogg]',
+                'E6': baseURL + 'E6.[mp3|ogg]',
+                'F0': baseURL + 'F0.[mp3|ogg]',
+                'F1': baseURL + 'F1.[mp3|ogg]',
+                'F2': baseURL + 'F2.[mp3|ogg]',
+                'F3': baseURL + 'F3.[mp3|ogg]',
+                'F4': baseURL + 'F4.[mp3|ogg]',
+                'F5': baseURL + 'F5.[mp3|ogg]',
+                'F6': baseURL + 'F6.[mp3|ogg]',
+                'F#0': baseURL + 'Fs0.[mp3|ogg]',
+                'F#1': baseURL + 'Fs1.[mp3|ogg]',
+                'F#2': baseURL + 'Fs2.[mp3|ogg]',
+                'F#3': baseURL + 'Fs3.[mp3|ogg]',
+                'F#4': baseURL + 'Fs4.[mp3|ogg]',
+                'F#5': baseURL + 'Fs5.[mp3|ogg]',
+                'F#6': baseURL + 'Fs6.[mp3|ogg]',
+                'G0': baseURL + 'G0.[mp3|ogg]',
+                'G1': baseURL + 'G1.[mp3|ogg]',
+                'G2': baseURL + 'G2.[mp3|ogg]',
+                'G3': baseURL + 'G3.[mp3|ogg]',
+                'G4': baseURL + 'G4.[mp3|ogg]',
+                'G5': baseURL + 'G5.[mp3|ogg]',
+                'G6': baseURL + 'G6.[mp3|ogg]',
+                'G#0': baseURL + 'Gs0.[mp3|ogg]',
+                'G#1': baseURL + 'Gs1.[mp3|ogg]',
+                'G#2': baseURL + 'Gs2.[mp3|ogg]',
+                'G#3': baseURL + 'Gs3.[mp3|ogg]',
+                'G#4': baseURL + 'Gs4.[mp3|ogg]',
+                'G#5': baseURL + 'Gs5.[mp3|ogg]',
+                'G#6': baseURL + 'Gs6.[mp3|ogg]'
+            }, function () {
+                synth.portamento = 5;
+                synths.push(synth);
+            }).toMaster();
+        }
+
+        let targetBox = document.getElementById("box");
+        let gestureBoxes = document.getElementsByClassName("gesture-box");
+
+        gesture.onHands(() => {
+            for (var i = 0; i < whiteKeys.length; i++) {
+                let pianoKey = whiteKeys[i];
+
+                gesture.userHoversObject(LANDMARK_AREAS.fingerTips, pianoKey, () => {
+                    if (!whiteNotePlaying[i]) {
+                        whiteNotePlaying[i] = true;
+                        synths[i].triggerAttackRelease(whiteKeyNotes[i], "2n");
+                        pianoKey.style.backgroundColor = "#DBDBDB";
+                    }
+                }, () => {
+                    whiteNotePlaying[i] = false;
+                    pianoKey.style.backgroundColor = "#EEEEEE";
+                });
+
+            }
+
+            for (var i = 0; i < blackKeys.length; i++) {
+                let pianoKey = blackKeys[i];
+                if (!pianoKey.classList.contains("invisible")) {
+                    gesture.userHoversObject(LANDMARK_AREAS.fingerTips, pianoKey, () => {
+                        if (!blackNotePlaying[i]) {
+                            blackNotePlaying[i] = true;
+                            synths[10 + i].triggerAttackRelease(blackKeyNotes[i], "2n");
+                            pianoKey.style.backgroundColor = "#272727";
+                        }
+                    }, () => {
+                        blackNotePlaying[i] = false;
+                        pianoKey.style.backgroundColor = "#333333";
+                    });
+                }
+            }
+        });
+
+        // Set up other features...
+        function scrollToSection(sectionName) {
+            console.log("scroll");
+            var elmntToView = document.getElementById(sectionName);
+            elmntToView.scrollIntoView();
+        }
+
+    </script>
 </body>
 
 </html>

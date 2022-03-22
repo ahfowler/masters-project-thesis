@@ -1,0 +1,62 @@
+export const LANDMARK_AREAS = {
+    // thumb: [1, 2, 3, 4],
+    // indexFinger: [5, 6, 7, 8],
+    // middleFinger: [9, 10, 11, 12],
+    // ringFinger: [13, 14, 15, 16],
+    // pinky: [17, 18, 19, 20],
+    // palm: [0, 5, 9, 13, 17]
+    fingerTips: ["indexTip", "middleTip", "ringTip", "pinkyTip", "thumbTip"],
+    indexTips: ["leftIndexTip", "rightIndexTip"],
+    palm: ["bottomPalm", "bottomIndex", "bottomMiddle", "bottomRing", "bottomPinky"],
+}
+
+export const LANDMARK_NAMES = {
+    0: "bottomPalm",
+    1: "bottomThumb",
+    2: "lowerMiddleThumb",
+    3: "upperMiddleThumb",
+    4: "thumbTip",
+    5: "bottomIndex",
+    6: "lowerMiddleIndex",
+    7: "upperMiddleIndex",
+    8: "indexTip",
+    9: "bottomMiddle",
+    10: "lowerMiddleMiddle",
+    11: "upperMiddleMiddle",
+    12: "middleTip",
+    13: "bottomRing",
+    14: "lowerMiddleRing",
+    15: "upperMiddleRing",
+    16: "ringTip",
+    17: "bottomPinky",
+    18: "lowerMiddlePinky",
+    19: "upperMiddlePinky",
+    20: "pinkyTip",
+}
+
+export const LANDMARK_POINTS = {
+    leftIndexTip: 8,
+    rightIndexTip: 8,
+    // General (Both Left and Right)
+    bottomPalm: 0,
+    bottomThumb: 1,
+    lowerMiddleThumb: 2,
+    upperMiddleThumb: 3,
+    thumbTip: 4,
+    bottomIndex: 5,
+    lowerMiddleIndex: 6,
+    upperMiddleIndex: 7,
+    indexTip: 8,
+    bottomMiddle: 9,
+    lowerMiddleMiddle: 10,
+    upperMiddleMiddle: 11,
+    middleTip: 12,
+    bottomRing: 13,
+    lowerMiddleRing: 14,
+    upperMiddleRing: 15,
+    ringTip: 16,
+    bottomPinky: 17,
+    lowerMiddlePinky: 18,
+    upperMiddlePinky: 19,
+    pinkyTip: 20
+}

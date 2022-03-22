@@ -1,8 +1,10 @@
 import { MediaPipe } from "../js/mediapipe.js"
+import { LANDMARK_AREAS, LANDMARK_NAMES, LANDMARK_POINTS } from '../js/global.js'
 
 class DOMElement {
-    constructor(uuid) {
+    constructor(uuid, domElement) {
         this.id = uuid;
+        this.htmlElement = domElement;
         this.selected = false;
         this.hovered = false;
         this.userWantsToPickUpElement = false;
@@ -32,7 +34,7 @@ export class Gesture {
         var allElements = document.getElementsByTagName("*"); // Get all the elements on the DOM.
         for (var i = 0, max = allElements.length; i < max; i++) {
             allElements[i].uuid = uuid.v4(); // Generate a UUID for the element.
-            this.globalElements.push(new DOMElement(allElements[i].uuid)); // Add element to list of global elements.
+            this.globalElements.push(new DOMElement(allElements[i].uuid), allElements[i]); // Add element to list of global elements.
         }
 
         // Step 2: Create a cursor reference.
@@ -66,7 +68,7 @@ export class Gesture {
 
     // Return the DOMElement with the given UUID.
     getElementByUUID(uuid) {
-        let result = globalElements.filter(function (element) { return element.id == uuid; });
+        let result = this.globalElements.filter(function (element) { return element.id == uuid; });
         return result ? result[0] : null; // or undefined
     }
 
@@ -89,7 +91,76 @@ export class Gesture {
     }
 
     onRightHand(callback) {
+        console.log("Setting onRightHand()...");
         this.mediapipe._rightHandLandmarksCallback = callback;
+    }
+
+    onHands(callback) {
+        this.mediapipe._onHandLandmarksCallback = callback;
+    }
+
+    // Interactions -----------------------------------------------------------------------------
+
+    userHoversObject(bodyPoints, element, trueCallback, falseCallback) {
+        // Define the map function.
+        function map(a, in_min, in_max, out_min, out_max) {
+            return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+        // Get element's DOMElement class.
+        const elementClass = this.getElementByUUID(element.uuid);
+
+        if (elementClass) {
+            elementClass.hovered = false; // Reset it everytime you call it.
+
+            for (var bodyPointIndex = 0; bodyPointIndex < bodyPoints.length; bodyPointIndex++) {
+                var bodyPoint = bodyPoints[bodyPointIndex];
+                let landmarkPoint = LANDMARK_POINTS[bodyPoint];
+
+                let x, y;
+
+                if ((bodyPoint == "indexTip" || bodyPoint == "ringTip" || bodyPoint == "middleTip" || bodyPoint == "pinkyTip" || bodyPoint == "thumbTip" || bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky")
+                    && this.mediapipe.mpResults.leftHandLandmarks) {
+                    x = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+                    y = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+                } else if ((bodyPoint == "indexTip" || bodyPoint == "ringTip" || bodyPoint == "middleTip" || bodyPoint == "pinkyTip" || bodyPoint == "thumbTip" || bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky")
+                    && this.mediapipe.mpResults.rightHandLandmarks) {
+                    x = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+                    y = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+                } else {
+                    continue; // bodyPoint is not detected.
+                }
+
+                // console.log(x, y);
+
+                this.cursor.x = x;
+                this.cursor.y = y;
+
+                let objectDimensions = element.getBoundingClientRect();
+
+                var position = {
+                    x1: objectDimensions.x,
+                    x2: objectDimensions.x + objectDimensions.width,
+                    y1: objectDimensions.y,
+                    y2: objectDimensions.y + objectDimensions.height
+                }
+
+                if (x > position.x1 && x < position.x2 && y > position.y1 && y < position.y2) {
+                    elementClass.hovered = true;
+                }
+            }
+
+            if (elementClass.hovered) {
+                trueCallback();
+                return true;
+            } else {
+                falseCallback(); // bodyPoint is not touching the object.
+                return false;
+            }
+
+        } else {
+            falseCallback(); // Object doesn't exist?
+            return false;
+        }
     }
 
     // Landmark Styles --------------------------------------------------------------------------
@@ -123,5 +194,9 @@ export class Gesture {
         inputVideo.style.zIndex = -100;
         inputVideo.style.height = "100%";
         inputVideo.style.width = "100%";
+    }
+
+    onLoad(callback) {
+        this.mediapipe.onLoad(callback);
     }
 }
