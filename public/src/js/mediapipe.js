@@ -1,4 +1,4 @@
-import { LANDMARK_AREAS, LANDMARK_NAMES, LANDMARK_POINTS } from '../js/global.js'
+import { LANDMARK_AREAS, LANDMARK_NAMES, LANDMARK_POINTS, updateGestures } from '../js/global.js'
 
 export class MediaPipe {
     // Important DOM Elements...
@@ -33,6 +33,11 @@ export class MediaPipe {
     _poseLandmarksStyling;
     _leftHandLandmarksStyling;
     _rightHandLandmarksStyling;
+
+    currentGestures = {
+        "openHand": false,
+        "closedHand": false
+    }
 
     constructor(video, canvas) {
         // Step 1: Assign video and canvas elements.
@@ -99,6 +104,8 @@ export class MediaPipe {
 
         this.canvasCtx.save();
         this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+
+        this.currentGestures = updateGestures(this.predictions);
 
         if (faceLandmarks) { // If we see face data...
             if (this._faceLandmarksStyling) {

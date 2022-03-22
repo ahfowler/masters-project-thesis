@@ -72,6 +72,72 @@ export class Gesture {
         return result ? result[0] : null; // or undefined
     }
 
+    // Move an element on the DOM.
+    moveObject(object, bodyPoints) {
+        // Define the map function.
+        function map(a, in_min, in_max, out_min, out_max) {
+            return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+
+        var bodyPointCoordinates = [];
+
+        for (var bodyPointIndex = 0; bodyPointIndex < bodyPoints.length; bodyPointIndex++) {
+            var bodyPoint = bodyPoints[bodyPointIndex];
+            let landmarkPoint = LANDMARK_POINTS[bodyPoint];
+
+            let x, y;
+
+            if ((bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky") && (this.mediapipe.mpResults.leftHandLandmarks || this.mediapipe.mpResults.rightHandLandmarks)) {
+                if (this.mediapipe.mpResults.leftHandLandmarks) {
+                    x = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+                    y = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+                } else {
+                    x = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+                    y = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+                }
+            }
+
+            bodyPointCoordinates.push({ x: x, y: y });
+        }
+
+        var centerPoint = ((pts) => {
+            // https://stackoverflow.com/questions/9692448/how-can-you-find-the-centroid-of-a-concave-irregular-polygon-in-javascript
+            var first = pts[0], last = pts[pts.length - 1];
+            if (first.x != last.x || first.y != last.y) pts.push(first);
+            var twicearea = 0,
+                x = 0, y = 0,
+                nPts = pts.length,
+                p1, p2, f;
+            for (var i = 0, j = nPts - 1; i < nPts; j = i++) {
+                p1 = pts[i]; p2 = pts[j];
+                f = p1.x * p2.y - p2.x * p1.y;
+                twicearea += f;
+                x += (p1.x + p2.x) * f;
+                y += (p1.y + p2.y) * f;
+            }
+            f = twicearea * 3;
+            return { x: x / f, y: y / f };
+        })(bodyPointCoordinates);
+
+        // console.log(centerPoint);
+        var x = centerPoint.x;
+        var y = centerPoint.y;
+
+        // this.mediapipe.canvasCtx.beginPath();
+        // this.mediapipe.canvasCtx.arc(x,y,3,0,2*Math.PI);
+        // this.mediapipe.canvasCtx.strokeColor = "#EEEEEE";
+        // this.mediapipe.canvasCtx.stroke();
+
+        this.cursor.x = centerPoint.x;
+        this.cursor.y = centerPoint.y;
+
+        let objectDimensions = object.getBoundingClientRect();
+
+        object.style.position = "absolute";
+        object.style.left = (x - objectDimensions.width) + "px";
+        // object.style.top = (y - (objectDimensions.height) + "px"; Need to fix?
+    }
+
     // ---------------------------------------- Client Methods ----------------------------------------
 
     // Body Part Detections ---------------------------------------------------------------------------
@@ -106,6 +172,7 @@ export class Gesture {
         function map(a, in_min, in_max, out_min, out_max) {
             return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
+
         // Get element's DOMElement class.
         const elementClass = this.getElementByUUID(element.uuid);
 
@@ -161,6 +228,50 @@ export class Gesture {
             falseCallback(); // Object doesn't exist?
             return false;
         }
+    }
+
+    userDragsAndDropsObject(object, pickUpCallback, dragCallback, dropCallback) {
+        // Get object's Object class.
+        const elementClass = this.getElementByUUID(object.uuid);
+
+        if (elementClass) {
+            if (!elementClass.userWantsToPickUpObject && !elementClass.userPickedUpObject) {
+                if (this.isMakingGesture("openHand")) {
+                    this.userHoversObject(LANDMARK_AREAS.palm, object, () => {
+                        // User wants to pick up object, must close palm now.
+                        elementClass.userWantsToPickUpObject = true;
+                    }, () => { }, () => { });
+                }
+            } else if (elementClass.userWantsToPickUpObject && !elementClass.userPickedUpObject) {
+                if (!this.userHoversObject(LANDMARK_AREAS.palm, object, () => { }, () => { })) {
+                    elementClass.userWantsToPickUpObject = false;
+                    return;
+                }
+
+                if (this.isMakingGesture("closedHand")) {
+                    this.userHoversObject(LANDMARK_AREAS.palm, object, () => {
+                        // User wants to pick up object, must close palm now.
+                        elementClass.userPickedUpObject = true;
+                        pickUpCallback();
+                    }, () => { }, () => { });
+                }
+            } else if (elementClass.userWantsToPickUpObject && elementClass.userPickedUpObject) {
+                if (this.isMakingGesture("closedHand")) {
+                    dragCallback();
+                    this.moveObject(object, LANDMARK_AREAS.palm);
+                } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
+                    dropCallback();
+                    elementClass.selected = false;
+                    elementClass.userWantsToPickUpObject = false;
+                    elementClass.userPickedUpObject = false;
+                }
+            }
+        }
+    }
+
+    // Gestures ---------------------------------------------------------------------------------
+    isMakingGesture(gestureName) {
+        return this.mediapipe.currentGestures[gestureName];
     }
 
     // Landmark Styles --------------------------------------------------------------------------

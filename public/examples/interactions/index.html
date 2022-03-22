@@ -162,6 +162,8 @@
         gesture.styleRightHandLandmarks("#EEEEEE", "#EEEEEE", 3, "#EEEEEE", 2);
 
         // Step 3: Create your experience!
+
+        // Piano Experience ----------------------------------------------------------------
         var synths = [];
 
         var boxCollections = document.getElementsByClassName("box-collection");
@@ -303,14 +305,68 @@
                     });
                 }
             }
-        });
 
-        // Set up other features...
-        function scrollToSection(sectionName) {
-            console.log("scroll");
-            var elmntToView = document.getElementById(sectionName);
-            elmntToView.scrollIntoView();
-        }
+            // Drag-and-Drop Experience ----------------------------------------------------------------
+
+            gesture.userDragsAndDropsObject(targetBox, () => {
+                targetBox.style.backgroundColor = "#e9c46a";
+            }, () => {
+                targetBox.style.backgroundColor = "#e9c46a";
+            }, () => {
+                targetBox.style.backgroundColor = "#3c6c8a";
+            });
+
+            // Gesture Guessing Experience ----------------------------------------------------------------
+
+            let gestureIndex = 0;
+            let currentGesture = (() => {
+                if (gesture.isMakingGesture("fist")) {
+                    gestureIndex = 0;
+                } else if (gesture.isMakingGesture("one")) {
+                    gestureIndex = 1;
+                } else if (gesture.isMakingGesture("two")) {
+                    gestureIndex = 2;
+                } else if (gesture.isMakingGesture("three")) {
+                    gestureIndex = 3;
+                } else if (gesture.isMakingGesture("four")) {
+                    gestureIndex = 4;
+                } else if (gesture.isMakingGesture("five")) {
+                    gestureIndex = 5;
+                }
+
+                return gestureIndex;
+            })();
+
+            switch (currentGesture) {
+                case "number zero":
+                    gestureIndex = 0;
+                    break;
+                case "number one":
+                    gestureIndex = 1;
+                    break;
+                case "number two":
+                    gestureIndex = 2;
+                    break;
+                case "number three":
+                    gestureIndex = 3;
+                    break;
+                case "number four":
+                    gestureIndex = 4;
+                    break;
+                case "number five":
+                    gestureIndex = 5;
+                    break;
+            }
+
+            document.getElementById("gesture-name").innerHTML = currentGesture;
+            gestureBoxes[gestureIndex].style.backgroundColor = "#36536d50";
+
+            for (var i = 0; i < gestureBoxes.length; i++) {
+                if (i != gestureIndex) {
+                    gestureBoxes[i].style.backgroundColor = "transparent";
+                }
+            }
+        });
 
     </script>
 </body>
