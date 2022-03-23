@@ -1,186 +1,129 @@
 import { VRButton } from "https://unpkg.com/three@0.133.0/examples/jsm/webxr/VRButton.js";
+// import { Utils } from "https://cdn.jsdelivr.net/npm/kalidokit@1.1.5/dist/index.min.js";
 
-//Import Helper Functions from Kalidokit
-const remap = Kalidokit.Utils.remap;
-const clamp = Kalidokit.Utils.clamp;
-const lerp = Kalidokit.Vector.lerp;
+var remap;
+var clamp;
+var lerp;
 
-/* THREEJS WORLD SETUP */
-let currentVrm;
+var kalidokitLibrary;
+var threeLibrary;
 
-xPosition = 0.0;
-cameraXPosition = 0.0;
-cameraZPosition = 2.0;
+var currentVrm;
+var virtualModels;
+var kalidokit;
 
-// renderer
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+export class KalidoKit {
+    renderer;
+    scene;
 
-// scene
-const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xff0000 );
+    clock;
+    camera;
 
+    loader;
 
-let cameraControls;
-let groundMirror, verticalMirror;
-let geometry, material;
+    currentVrm;
+    currentRiggingData;
+    loggedInUser;
 
+    virtualModels;
 
-// camera
-const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 400);
-camera.position.set(0, 3.0, 2.0);
+    constructor(loggedInUser, threeSetUp) {
+        this.renderer = new THREE.WebGLRenderer({ alpha: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(this.renderer.domElement);
 
-cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-cameraControls.target.set(0, 3.0, -25.0);
-cameraControls.maxDistance = 400;
-cameraControls.minDistance = 5;
-cameraControls.update();
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 400);
 
-const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
+        this.clock = new THREE.Clock();
 
-// reflectors/mirrors
+        this.loader = new THREE.GLTFLoader();
+        this.loader.crossOrigin = "anonymous";
 
-geometry = new THREE.CircleGeometry(30, 30);
-groundMirror = new THREE.Reflector(geometry, {
-    clipBias: 0.003,
-    textureWidth: window.innerWidth * window.devicePixelRatio,
-    textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 0x777777
-});
-groundMirror.position.y = 0.5;
-groundMirror.rotateX(- Math.PI / 2);
-scene.add(groundMirror);
+        this.virtualModels = {};
 
-geometry = new THREE.PlaneGeometry(100, 100);
-verticalMirror = new THREE.Reflector(geometry, {
-    clipBias: 0.003,
-    textureWidth: window.innerWidth * window.devicePixelRatio,
-    textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 0x889999
-});
-verticalMirror.position.y = 50;
-verticalMirror.position.z = - 30;
-scene.add(verticalMirror);
+        kalidokit = this;
 
-// walls
-const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: "orange" }));
-planeTop.position.y = 100;
-planeTop.rotateX(Math.PI / 2);
-scene.add(planeTop);
+        if (threeSetUp) {
+            threeSetUp(this.renderer, this.scene, this.camera);
+        }
 
-const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-planeBottom.rotateX(- Math.PI / 2);
-scene.add(planeBottom);
+        this.loggedInUser = loggedInUser;
+        if (this.loggedInUser) {
+            document.body.appendChild(VRButton.createButton(this.renderer));
+            this.renderer.xr.enabled = true;
 
-const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x7f7fff }));
-planeFront.position.z = 50;
-planeFront.position.y = 50;
-planeFront.rotateY(Math.PI);
-scene.add(planeFront);
-
-const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
-planeRight.position.x = 50;
-planeRight.position.y = 50;
-planeRight.rotateY(- Math.PI / 2);
-scene.add(planeRight);
-
-const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xff0000 }));
-planeLeft.position.x = - 50;
-planeLeft.position.y = 50;
-planeLeft.rotateY(Math.PI / 2);
-scene.add(planeLeft);
-
-// lights
-const mainLight = new THREE.PointLight(0xcccccc, 1.5, 250);
-mainLight.position.y = 60;
-scene.add(mainLight);
-
-const greenLight = new THREE.PointLight(0x00ff00, 0.25, 1000);
-greenLight.position.set(550, 50, 0);
-scene.add(greenLight);
-
-const redLight = new THREE.PointLight(0xff0000, 0.25, 1000);
-redLight.position.set(- 550, 50, 0);
-scene.add(redLight);
-
-const blueLight = new THREE.PointLight(0x7f7fff, 0.25, 1000);
-blueLight.position.set(0, 50, 550);
-scene.add(blueLight);
-
-// Main Render Loop
-const clock = new THREE.Clock();
-
-function animate() {
-    renderer.setAnimationLoop(animate);
-    // requestAnimationFrame(animate);
-
-    if (currentVrm) {
-        // Update model to render physics
-        currentVrm.update(clock.getDelta());
+            document.getElementById("VRButton").addEventListener('click', () => {
+                var selectedObject = scene.getObjectByName(this.loggedInUser);
+                this.camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
+                this.camera.y += 1.0; // Move a little away from the face.
+                selectedObject.add(camera);
+            });
+        }
     }
 
-    renderer.render(scene, camera);
+    loadUser(socketID, modelURL, userName) {
+        this.loader.load(
+            modelURL,
+            gltf => {
+                THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
+                THREE.VRM.from(gltf).then(vrm => {
+                    let object = vrm.scene;
+                    object.name = socketID;
+
+                    object.scale.set(3, 3, 3);
+                    object.position.y = 0.5;
+                    object.position.z = -25.0;
+                    this.scene.add(object);
+
+                    this.virtualModels[socketID] = {};
+                    this.virtualModels[socketID].riggedCharacter = {};
+                    this.virtualModels[socketID].vrm = vrm;
+
+                    vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
+                    vrm.scene.position.x = 0.0;
+                });
+            },
+            progress =>
+                console.log(
+                    "Loading model...",
+                    100.0 * (progress.loaded / progress.total),
+                    "%"
+                ),
+            error => console.error(error)
+        );
+    }
+
+    onResults(results, socketID) {
+        this.currentVrm = this.virtualModels[socketID].vrm;
+        currentVrm = this.currentVrm;
+        virtualModels = this.virtualModels;
+        animateVRM(this.currentVrm, results, socketID);
+    }
+
+    onThreeSetUp(callback) {
+        this._threeSetUpCallback = callback;
+    }
+
+    sendLibrary(kalidokitObject) {
+        kalidokitLibrary = kalidokitObject;
+        remap = kalidokitLibrary.Utils.remap;
+        clamp = kalidokitLibrary.Utils.clamp;
+        lerp = kalidokitLibrary.Vector.lerp;
+        console.log(kalidokitLibrary);
+    }
+
+    sendTHREE(threeObject) {
+        threeLibrary = threeObject;
+        oldLookTarget = new threeLibrary.Euler();
+        console.log(threeObject);
+    }
+
 }
-animate();
 
-document.body.appendChild(VRButton.createButton(renderer));
-renderer.xr.enabled = true;
-
-document.getElementById("VRButton").addEventListener('click', () => {
-    var selectedObject = scene.getObjectByName(mainUserSocketID);
-    camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
-    camera.y += 1.0; // Move a little away from the face.
-    selectedObject.add(camera);
-});
-
-/* VRM CHARACTER SETUP */
-// Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
+// KalidoKit Rigging Methods ------------------------------------------------------------------
 var riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
-
-// Import Character VRM
-const loader = new THREE.GLTFLoader();
-loader.crossOrigin = "anonymous";
-
-loadUser = function (socketID, modelURL) {
-    loader.load(
-        modelURL,
-
-        gltf => {
-            THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
-
-            THREE.VRM.from(gltf).then(vrm => {
-                let object = vrm.scene;
-                object.name = socketID;
-
-                object.scale.set( 3, 3, 3 );
-                object.position.y = 0.5;
-                object.position.z = -25.0;
-                scene.add(object);
-
-                virtualModels[socketID] = {};
-                virtualModels[socketID].riggedCharacter = {};
-                virtualModels[socketID].vrm = vrm;
-
-                vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                vrm.scene.position.x = xPosition;
-                xPosition += 3.0;
-
-                updateCamera();
-            });
-        },
- 
-        progress =>
-            console.log(
-                "Loading model...",
-                100.0 * (progress.loaded / progress.total),
-                "%"
-            ),
-
-        error => console.error(error)
-    );
-}
 
 // Animate Rotation Helper function
 const rigRotation = (
@@ -224,7 +167,7 @@ const rigPosition = (
     Part.position.lerp(vector, lerpAmount); // interpolate
 };
 
-let oldLookTarget = new THREE.Euler()
+let oldLookTarget = new THREE.Euler();
 const rigFace = (riggedFace) => {
     if (!currentVrm) { return }
     rigRotation("Neck", riggedFace.head);
@@ -238,7 +181,7 @@ const rigFace = (riggedFace) => {
     // riggedFace.eye.l = lerp(clamp(0.5 - riggedFace.eye.l, -0.5, 1.5), Blendshape.getValue(PresetName.Blink), 0.5);
     // riggedFace.eye.r = lerp(clamp(0.5 - riggedFace.eye.r, -0.5, 1.5), Blendshape.getValue(PresetName.Blink), 0.5);
 
-    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye, riggedFace.head.y);
+    riggedFace.eye = kalidokitLibrary.Face.stabilizeBlink(riggedFace.eye, riggedFace.head.y);
 
     Blendshape.setValue(PresetName.Blink, 1.0 - riggedFace.eye.l);
 
@@ -360,37 +303,3 @@ const animateVRM = (vrm, results, sID) => {
         rigRotation("RightLittleDistal", riggedRightHand.RightLittleDistal);
     }
 };
-
-
-onResults = (results, socketID) => {
-    // Animate model
-    currentVrm = virtualModels[socketID].vrm;
-    animateVRM(currentVrm, results, socketID);
-}
-
-removeModel = (sID) => {
-    var selectedObject = scene.getObjectByName(sID);
-    scene.remove(selectedObject);
-
-    if (xPosition > 0) {
-        xPosition -= 3.0;
-    }
-
-    updateCamera(true, sID);
-}
-
-var updateCamera = (remove, sID) => {
-    if (remove) {
-        cameraXPosition -= 0.25;
-        cameraZPosition -= 0.25;
-    } else {
-        cameraXPosition += 0.25;
-        cameraZPosition += 0.25;
-    }
-
-    // camera
-    // orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // orbitCamera.position.set(cameraXPosition, 1.0, cameraZPosition);
-
-    animate();
-}

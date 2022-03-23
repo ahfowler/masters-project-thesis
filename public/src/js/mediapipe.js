@@ -19,6 +19,7 @@ export class MediaPipe {
     drawingUtils;
     videoLoaded = false;
     _onLoadCallback;
+    _onEmitResults;
 
     // The Good Stuff!
     mpResults; // Holistic Landmarks
@@ -87,7 +88,9 @@ export class MediaPipe {
 
     async onResults(results) {
         if (!this.videoLoaded) {
-            this._onLoadCallback();
+            if (this._onLoadCallback) {
+                this._onLoadCallback();
+            }
             this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
             this.videoLoaded = true;
         }
@@ -113,7 +116,7 @@ export class MediaPipe {
             }
 
             if (this._faceLandmarksCallback) {
-                this._faceLandmarksCallback();
+                this._faceLandmarksCallback(faceLandmarks);
             }
         }
 
@@ -123,7 +126,7 @@ export class MediaPipe {
             }
 
             if (this._poseLandmarksCallback) {
-                this._poseLandmarksCallback();
+                this._poseLandmarksCallback(pose2DLandmarks, pose3DLandmarks);
             }
         }
 
@@ -139,21 +142,25 @@ export class MediaPipe {
 
             if (leftHandLandmarks || rightHandLandmarks) { // If we see both hands data...
                 if (this._onHandLandmarksCallback) {
-                    this._onHandLandmarksCallback();
+                    this._onHandLandmarksCallback(leftHandLandmarks, rightHandLandmarks);
                 }
             }
-            
+
             if (leftHandLandmarks) { // If we see left hands data...
                 if (this._leftHandLandmarksCallback) {
-                    this._leftHandLandmarksCallback();
+                    this._leftHandLandmarksCallback(leftHandLandmarks);
                 }
             }
-            
+
             if (rightHandLandmarks) { // If we see right hands data...
                 if (this._rightHandLandmarksCallback) {
-                    this._rightHandLandmarksCallback();
+                    this._rightHandLandmarksCallback(rightHandLandmarks);
                 }
             }
+        }
+
+        if (this._onEmitCallback) {
+            this._onEmitCallback();
         }
 
         this.canvasCtx.restore();

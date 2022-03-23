@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gesture.js Demo: Embodied Virtual Reality</title>
+    <title>Gesture.js | Embodied Virtual Reality</title>
     <meta charset="utf-8">
 
     <!-- Download JQuery -->
@@ -38,69 +38,102 @@
     <!--     Kalidokit Kinematic Solver -->
     <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
 
+    <!-- Socket.io -->
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+        integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+        crossorigin="anonymous"></script>
+
+    <!-- Download Gesture CSS Stylesheet -->
+    <link rel="stylesheet" href="../../src/css/gesture.css">
+
+    <!-- Example-Specific Imports -->
     <link rel="stylesheet" href="./index.css">
-    <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io();
-        var modelName = "";
-        var socketID;
-
-        socket.on("sendMainUserDetails", (classroomSocketID) => {
-            let userName = document.getElementById("name-input").value;
-            console.log("Main User: " + socketID, "Classroom: " + classroomSocketID);
-            socket.emit("sendMainVRMModel", vrmURL, userName, socketID, classroomSocketID); // Send to the classroom that you're the main character.
-            socket.emit("sendVRMModel", vrmURL, userName, socketID, classroomSocketID); // Send model details to everyone.
-        });
-
-        socket.on('recievedSocketID', (sID) => {
-            socketID = sID;
-
-            let userName = document.getElementById("name-input").value;
-
-            window.open("./kalidokit.html", '_blank', 'location=yes,height=864,width=1152,scrollbars=no,status=yes'); // Open a new window for the classroom.
-
-
-        });
+        var chooseModel
+        var selectModel;
     </script>
 </head>
 
 <body>
-    <div class="container">
-        <video class="input_video"></video>
-        <div class="canvas-container">
-            <canvas id="output_canvas" class="output_canvas" width="1280px" height="720px"
-                style="display: none;"></canvas>
-        </div>
-        <div id="example-application">
-            <div id="welcome-message">
-                <h2>Welcome to Your Embodied Virtual Space</h2>
-                <div>
-                    <h3>What's your name?</h3>
-                    <input type="text" id="name-input"></input>
-                    <h3>Choose your character.</h3>
-                    <div style="display: flex; justify-content: center;">
-                        <div id="modelA" class="character-box" onclick="chooseModel('modelA')">
-                            <div style="background-image:url(./vrm-models/modelA.png)"></div>
-                            <p>Model A</p>
-                        </div>
-                        <div id="modelB" class="character-box" onclick="chooseModel('modelB')">
-                            <div style="background-image:url(./vrm-models/modelB.png)"></div>
-                            <p>Model B</p>
-                        </div>
-                        <div id="modelC" class="character-box" onclick="chooseModel('modelC')">
-                            <div style="background-image:url(./vrm-models/modelC.png)"></div>
-                            <p>Model C</p>
-                        </div>
+    <div id="example-application">
+        <div id="welcome-message">
+            <h2>Welcome!</h2>
+            <div>
+                <h3>What's your name?</h3>
+                <input type="text" id="name-input"></input>
+                <h3>Choose your character.</h3>
+                <div style="display: flex; justify-content: center;">
+                    <div id="modelA" class="character-box" onclick="chooseModel('modelA')">
+                        <div style="background-image:url(../../assets/vrm-models/modelA.png)"></div>
+                        <p>Model A</p>
+                    </div>
+                    <div id="modelB" class="character-box" onclick="chooseModel('modelB')">
+                        <div style="background-image:url(../../assets/vrm-models/modelB.png)"></div>
+                        <p>Model B</p>
+                    </div>
+                    <div id="modelC" class="character-box" onclick="chooseModel('modelC')">
+                        <div style="background-image:url(../../assets/vrm-models/modelC.png)"></div>
+                        <p>Model C</p>
                     </div>
                 </div>
+                <h3>What's the room code?</h3>
+                <input type="text" id="room-input"></input>
             </div>
-
-            <a id="enter-button" onclick="sendModel()">Enter</a>
         </div>
-        <!-- <script src="./mediapipe-support/initialize.js"></script>
-        <script src="./mediapipe-support/gesturesLibrary.js"></script>
-        <script src="./mediapipe-support/interactionsLibrary.js"></script> -->
-        <script src="./index.js"></script>
+
+        <a id="enter-button" onclick="selectModel()">Enter</a>
+        <p id="error-message"></p>
+    </div>
+    <script type="module">
+        import { Gesture } from "../../src/js/gesture.js";
+        import { VirtualRealityCamera } from "../../src/js/virtualreality.js";
+
+        // Step 1: Import and initialize Gesture.js
+        var gesture = new Gesture("example-application");
+
+        // Step 2: Create and initialize components for virtual reality.
+        var embodiedVR = new VirtualRealityCamera(gesture); // This rigs your gestures to an avatar and emits the coordinates.
+
+        var data = {
+            name: "",
+            vrmURL: "",
+            roomCode: ""
+        };
+
+        let roomCode;
+        let vrmURL;
+
+        chooseModel = function chooseModel(modelName) {
+            vrmURL = "../../assets/vrm-models/" + modelName + ".vrm";
+            document.getElementById(modelName).style.border = "2px solid black";
+
+            // Deselect all the other characters...
+            let otherCharacters = document.getElementsByClassName("character-box");
+            for (var i = 0; i < otherCharacters.length; i++) {
+                if (otherCharacters[i].id != modelName) {
+                    otherCharacters[i].style.border = "0px solid transparent";
+                }
+            }
+        }
+
+        selectModel = function selectModel() {
+            data.name = document.getElementById("name-input").value;
+            data.vrmURL = vrmURL;
+
+            roomCode = document.getElementById("room-input").value;
+            data.roomCode = roomCode;
+
+            if (vrmURL) {
+                // Assign the emit to the room.
+                embodiedVR.joinRoom(roomCode, data);
+
+                let roomURL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/room.html#" + roomCode;
+                document.getElementById("error-message").innerHTML = "Open this link in a new window (not a tab): <br /> <code>" + roomURL + "</code>";
+            } else {
+                document.getElementById("error-message").innerText = "Please select a model!";
+            }
+        }
+    </script>
 </body>
 
 </html>

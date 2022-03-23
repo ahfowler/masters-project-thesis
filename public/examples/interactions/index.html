@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gesture.js | Interactions Example</title>
+    <title>Gesture.js | Interacting with the DOM</title>
     <meta charset="utf-8">
 
     <!-- Download JQuery -->
@@ -49,7 +49,7 @@
         </div>
 
         <div id="demo" style="opacity: 0;">
-            <h2>Touch any element on the DOM with any part of your body.</h2>
+            <h2>You can touch any element on the DOM with any part of your body.</h2>
             <p>Try playing the piano with your fingertips.</p>
             <div id="hover-interaction-boxes" class="box-collection">
                 <div id="white-keys">
@@ -103,7 +103,7 @@
 
             <br />
 
-            <h2 id="box-drag">Manipulate elements on the DOM with any gesture.</h2>
+            <h2 id="box-drag">You can manipulate elements on the DOM with any gesture.</h2>
             <p>Try picking up the box by making a grab gesture (&#128400; + &#9994;) and placing it in the target
                 area.</p>
             <div id="drag-interaction-boxes" class="box-collection">
@@ -119,7 +119,7 @@
 
             <br />
 
-            <h2 id="gestures">Identify any gesture.</h2>
+            <h2 id="gestures">You can identify any gesture.</h2>
             <p>Try making any of the gestures below and see it light up.</p>
             <p>You made the <span id="gesture-name"></span> gesture!</p>
             <div id="gesture-interaction-boxes" class="box-collection">
@@ -333,30 +333,8 @@
                 } else if (gesture.isMakingGesture("five")) {
                     gestureIndex = 5;
                 }
-
                 return gestureIndex;
             })();
-
-            switch (currentGesture) {
-                case "number zero":
-                    gestureIndex = 0;
-                    break;
-                case "number one":
-                    gestureIndex = 1;
-                    break;
-                case "number two":
-                    gestureIndex = 2;
-                    break;
-                case "number three":
-                    gestureIndex = 3;
-                    break;
-                case "number four":
-                    gestureIndex = 4;
-                    break;
-                case "number five":
-                    gestureIndex = 5;
-                    break;
-            }
 
             document.getElementById("gesture-name").innerHTML = currentGesture;
             gestureBoxes[gestureIndex].style.backgroundColor = "#36536d50";

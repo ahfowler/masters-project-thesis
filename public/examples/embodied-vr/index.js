@@ -176,19 +176,3 @@ const camera = new Camera(videoElement, {
 videoElement.classList.add('selfie');
 camera.start();
 
-function chooseModel(modelName) {
-    vrmURL = "../../assets/vrm-models/" + modelName + ".vrm";
-    document.getElementById(modelName).style.border = "2px solid black";
-
-    let otherCharacters = document.getElementsByClassName("character-box");
-    for (var i = 0; i < otherCharacters.length; i++) {
-        if (otherCharacters[i].id != modelName) {
-            otherCharacters[i].style.border = "0px solid transparent";
-        }
-    }
-}
-
-function sendModel() {
-    socket.emit("getSocketID");
-}
-

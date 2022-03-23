@@ -1,1 +1,340 @@
-[]
+{
+  "1234": {
+    "-zGKswQl3b2iE6KFAAAB": {
+      "socketID": "-zGKswQl3b2iE6KFAAAB",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "VTODzp1mSwfgbYIGAAAD": {
+      "socketID": "VTODzp1mSwfgbYIGAAAD",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "xY-1VFHFxp8lQWXOAAAD": {
+      "socketID": "xY-1VFHFxp8lQWXOAAAD",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "4r2HaRHdZ4QVnUQuAAAH": {
+      "socketID": "4r2HaRHdZ4QVnUQuAAAH",
+      "data": {
+        "name": "aaaaaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "-sHD3p26F1FLTllLAAAB": {
+      "socketID": "-sHD3p26F1FLTllLAAAB",
+      "data": {
+        "name": "alice",
+        "vrmURL": "../../assets/vrm-models/modelC.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "70xx4nTGcSRpxv7JAAAJ": {
+      "socketID": "70xx4nTGcSRpxv7JAAAJ",
+      "data": {
+        "name": "foxy",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "NcUznco_9pUigZCQAAAD": {
+      "socketID": "NcUznco_9pUigZCQAAAD",
+      "data": {
+        "name": "foxy",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "p4nHDx6fI8-lmAIRAAAB": {
+      "socketID": "p4nHDx6fI8-lmAIRAAAB",
+      "data": {
+        "name": "foxy",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "1Z73AXNPD9YupQ_pAAAF": {
+      "socketID": "1Z73AXNPD9YupQ_pAAAF",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "_mBrXevl6xFRgeclAAAD": {
+      "socketID": "_mBrXevl6xFRgeclAAAD",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelC.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "gipV9i_XkApfL9gbAAAH": {
+      "socketID": "gipV9i_XkApfL9gbAAAH",
+      "data": {
+        "name": "4444",
+        "vrmURL": "../../assets/vrm-models/modelA.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "99btWfnGDBCTHGHgAAAD": {
+      "socketID": "99btWfnGDBCTHGHgAAAD",
+      "data": {
+        "name": "4444",
+        "vrmURL": "../../assets/vrm-models/modelA.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "hfiU_41SqBm5iwb0AAAd": {
+      "socketID": "hfiU_41SqBm5iwb0AAAd",
+      "data": {
+        "name": "aaaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "8H_oQXLcNLRlybs-AAAD": {
+      "socketID": "8H_oQXLcNLRlybs-AAAD",
+      "data": {
+        "name": "aaaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "HHFZqWdlKiU3ig5tAAAH": {
+      "socketID": "HHFZqWdlKiU3ig5tAAAH",
+      "data": {
+        "name": "ron",
+        "vrmURL": "../../assets/vrm-models/modelC.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "VABLP6owI0O3I00LAAAN": {
+      "socketID": "VABLP6owI0O3I00LAAAN",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "XpkOJfywWtpY19KQAAAT": {
+      "socketID": "XpkOJfywWtpY19KQAAAT",
+      "data": {
+        "name": "aza",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "hnosAua06uBzvtIkAAAZ": {
+      "socketID": "hnosAua06uBzvtIkAAAZ",
+      "data": {
+        "name": "1245",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "ytQytAzYYS0WmROqAAAj": {
+      "socketID": "ytQytAzYYS0WmROqAAAj",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "LZHWTEMYVoCeBklZAAAp": {
+      "socketID": "LZHWTEMYVoCeBklZAAAp",
+      "data": {
+        "name": "",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "qB-aA7Z15EhsL8_OAAAt": {
+      "socketID": "qB-aA7Z15EhsL8_OAAAt",
+      "data": {
+        "name": "aaaaaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "MYPwkVd8-9QtfYNiAAAB": {
+      "socketID": "MYPwkVd8-9QtfYNiAAAB",
+      "data": {
+        "name": "aaaaaaa",
+        "vrmURL": "../../assets/vrm-models/modelC.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "U8ijpAt9CStp0xGoAAAF": {
+      "socketID": "U8ijpAt9CStp0xGoAAAF",
+      "data": {
+        "name": "aza",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "lBF0sxGWziVV4Z_nAAAD": {
+      "socketID": "lBF0sxGWziVV4Z_nAAAD",
+      "data": {
+        "name": "aza",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "C6jgfnXfSxevWJOVAAAR": {
+      "socketID": "C6jgfnXfSxevWJOVAAAR",
+      "data": {
+        "name": "aaaaaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "-2hxks9qO141dBthAAAf": {
+      "socketID": "-2hxks9qO141dBthAAAf",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "_ZG_82hYIL0vyqeFAAAl": {
+      "socketID": "_ZG_82hYIL0vyqeFAAAl",
+      "data": {
+        "name": "1234",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "8c1l56bCBeD3Or5uAAAE": {
+      "socketID": "8c1l56bCBeD3Or5uAAAE",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "TkI7Suoq-Pu0JlsKAAAO": {
+      "socketID": "TkI7Suoq-Pu0JlsKAAAO",
+      "data": {
+        "name": "azriar",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "7AMy1w42y4xWj12IAAAU": {
+      "socketID": "7AMy1w42y4xWj12IAAAU",
+      "data": {
+        "name": "aaaa",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "XLhmfC_LYjofRkrIAAAc": {
+      "socketID": "XLhmfC_LYjofRkrIAAAc",
+      "data": {
+        "name": "azria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "CrQTuzn4lsnJZWPLAAAi": {
+      "socketID": "CrQTuzn4lsnJZWPLAAAi",
+      "data": {
+        "name": "ewer",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "TwEQNs3PlwspwkkrAAAm": {
+      "socketID": "TwEQNs3PlwspwkkrAAAm",
+      "data": {
+        "name": "rebecca",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "Zi2JFUZEJSmzUedkAAAD": {
+      "socketID": "Zi2JFUZEJSmzUedkAAAD",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "BXoaug0bdqxbTftOAAAF": {
+      "socketID": "BXoaug0bdqxbTftOAAAF",
+      "data": {
+        "name": "ana",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "4jXtdckEEAT1rFZTAAAB": {
+      "socketID": "4jXtdckEEAT1rFZTAAAB",
+      "data": {
+        "name": "ana",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "Sq07feCF1hgZGVl1AAAF": {
+      "socketID": "Sq07feCF1hgZGVl1AAAF",
+      "data": {
+        "name": "azria",
+        "vrmURL": "../../assets/vrm-models/modelC.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "Fyfd6OPjo9rCL_FgAAAL": {
+      "socketID": "Fyfd6OPjo9rCL_FgAAAL",
+      "data": {
+        "name": "azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "cJZu-y-wa-H6UGi6AAAJ": {
+      "socketID": "cJZu-y-wa-H6UGi6AAAJ",
+      "data": {
+        "name": "343",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "hCCr6lrYE1dLFXrWAAAD": {
+      "socketID": "hCCr6lrYE1dLFXrWAAAD",
+      "data": {
+        "name": "343",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "1ssIuZv838OikMIGAAAH": {
+      "socketID": "1ssIuZv838OikMIGAAAH",
+      "data": {
+        "name": "fkefepls",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    },
+    "ZPDiAOglMc0DewYmAAAP": {
+      "socketID": "ZPDiAOglMc0DewYmAAAP",
+      "data": {
+        "name": "34333",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234"
+      }
+    }
+  }
+}
