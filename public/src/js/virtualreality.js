@@ -249,17 +249,19 @@ export class VirtualRealityRoom {
     }
 
     loadUser(userSocketID) {
-        let userInfo = this.connectedUsers[userSocketID];
+        if (this.connectedUsers) {
+            let userInfo = this.connectedUsers[userSocketID];
 
-        if (userInfo && userSocketID) {
-            console.log("Loading " + userSocketID + "...");
+            if (userInfo && userSocketID) {
+                console.log("Loading " + userSocketID + "...");
 
-            // Load the user in Three.js
-            let socketID = userInfo.socketID;
-            let vrmURL = userInfo.data.vrmURL;
-            let name = userInfo.data.name;
+                // Load the user in Three.js
+                let socketID = userInfo.socketID;
+                let vrmURL = userInfo.data.vrmURL;
+                let name = userInfo.data.name;
 
-            this.kalidokit.loadUser(socketID, vrmURL, name);
+                this.kalidokit.loadUser(socketID, vrmURL, name);
+            }
         }
     }
 
