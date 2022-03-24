@@ -1,2 +1,13 @@
 {
+  "1234": {
+    "_4XkmK-JqlmMEzs0AAAF": {
+      "socketID": "_4XkmK-JqlmMEzs0AAAF",
+      "data": {
+        "name": "Azaria",
+        "vrmURL": "../../assets/vrm-models/modelB.vrm",
+        "roomCode": "1234",
+        "generatedCode": "oslbp"
+      }
+    }
+  }
 }
