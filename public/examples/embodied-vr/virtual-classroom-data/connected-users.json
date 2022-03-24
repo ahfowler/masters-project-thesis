@@ -1,2 +1,13 @@
 {
+  "1234": {
+    "82fttvpiwp6oiiL0AAAD": {
+      "socketID": "82fttvpiwp6oiiL0AAAD",
+      "data": {
+        "name": "asich",
+        "vrmURL": "../../assets/vrm-models/modelA.vrm",
+        "roomCode": "1234",
+        "generatedCode": "vBKkb"
+      }
+    }
+  }
 }
