@@ -53,7 +53,7 @@
                 document.title = "Room " + roomNumber;
                 var currentRoom = new VirtualRealityRoom(roomNumber, generatedCode, (renderer, scene, camera) => {
                     console.log("Set up the scene...");
-                    // scene.background = new THREE.Color( 0x000000 );
+                    scene.background = new THREE.Color( 0xff000 );
 
                     let cameraControls;
                     let groundMirror, verticalMirror;
