@@ -91,6 +91,12 @@ export class VirtualRealityRoom {
         this.roomNumber = roomNumber;
         this.socket = io();
 
+        this.socket.on('sentConnectedUsers'), () => {
+            this.connectedUsers = users;
+        };
+
+        this.socket.emit('connectClassroom', roomNumber); // This will connect the classroom and update connectedUsers.
+
         this.socket.on('sentConnectedUsers', (users) => {
             this.connectedUsers = users;
 
@@ -208,8 +214,6 @@ export class VirtualRealityRoom {
 
             console.log("Updated users from callback...", users);
         });
-
-        this.socket.emit('connectClassroom', roomNumber); // This will connect the classroom and update connectedUsers.
     }
 
     _renderModelCallback = (userSocketID, data) => {
