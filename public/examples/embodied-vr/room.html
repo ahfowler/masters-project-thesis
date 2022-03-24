@@ -237,7 +237,9 @@
                 return this;
             };
 
-            circlePoints = circlePoints.swap(0, numberPoints - 1);
+            if (circlePoints > 1) {
+                circlePoints = circlePoints.swap(0, numberPoints - 1);
+            }
 
 
 
