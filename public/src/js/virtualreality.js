@@ -57,9 +57,7 @@ export class VirtualRealityCamera {
     }
 
     joinRoom(roomNumber, data) {
-
         this.avatar.roomNumber = roomNumber;
-        console.log(data);
         this.avatar.socketID = this.socket.id;
         this.gesture.mediapipe._onEmitCallback = () => {
             // console.log(this.avatar.roomNumber, this.avatar.socketID);
@@ -71,6 +69,11 @@ export class VirtualRealityCamera {
 
         this.socket.emit("joinRoom", roomNumber, data);
     }
+
+    leaveRoom(roomNumber, data) {
+        // Manually invoke the disconnect.
+        this.socket.emit("leaveRoom", roomNumber, data);
+    }
 }
 
 export class VirtualRealityRoom {
@@ -81,55 +84,136 @@ export class VirtualRealityRoom {
 
     kalidokit;
 
-    constructor(roomNumber, threeSetUp, loggedInUser) {
+    _userJoinCallback;
+    _userLeftCallback;
+
+    constructor(roomNumber, loggedInUser, threeSetUp) {
         this.roomNumber = roomNumber;
         this.socket = io();
 
         this.socket.on('sentConnectedUsers', (users) => {
             this.connectedUsers = users;
-            console.log("Updated users...", users);
+
+            var userSocketID;
+            var data;
+
+            if (!this.kalidokit) { // Updating the users for the first time...
+                if (loggedInUser) { // A user entered their generated code...
+                    for (const socketID in this.connectedUsers) {
+                        if (this.connectedUsers[socketID].data.generatedCode == loggedInUser) {
+                            // console.log(this.connectedUsers[socketID].data.generatedCode, loggedInUser);
+                            // Step 1: Set up the THREE.js environment.
+                            this.kalidokit = new KalidoKit(socketID, threeSetUp);
+                            this.kalidokit.sendLibrary(Kalidokit);
+                            this.kalidokit.sendTHREE(THREE);
+
+                            // Step 2: Set up variables for callbacks.
+                            userSocketID = socketID;
+                            data = this.connectedUsers[socketID].data;
+
+                            // Step 3: Set up the results and rigging data.
+                            var kalidokit = this.kalidokit;
+
+                            this.socket.on('sentMPResults', function (results, socketID) {
+                                // console.log(results);
+                                this.on('sentRiggedData', function (riggedData, socketID) {
+                                    // console.log(kalidokit.virtualModels, socketID);
+                                    if (kalidokit && kalidokit.virtualModels[socketID]) {
+                                        kalidokit.virtualModels[socketID].riggedCharacter = riggedData;
+                                        kalidokit.onResults(results, socketID);
+                                    }
+                                });
+                            });
+                        }
+                    }
+
+                    if (this.loadUserOnJoin) {
+                        this.loadUser(userSocketID, data);
+                    }
+                } else { // A user is just viewing the room.
+
+                }
+
+                if (this._userJoinCallback) {
+                    this._userJoinCallback();
+                }
+
+            } else { // Just updating users manually...
+                if (this.renderModel) {
+                    // console.log("Current Users: ", users);
+                    this.renderModel();
+                }
+
+                if (this._userJoinCallback) {
+                    this._userJoinCallback();
+                }
+
+                if (this._userLeftCallback) {
+                    this._userLeftCallback();
+                }
+            }
+
+            console.log("Updated users from callback...", users);
         });
 
         this.socket.emit('connectClassroom', roomNumber); // This will connect the classroom and update connectedUsers.
-
-        // Step 3: Set up the THREE.js environment.
-        this.kalidokit = new KalidoKit(loggedInUser, threeSetUp);
-        this.kalidokit.sendLibrary(Kalidokit);
-        this.kalidokit.sendTHREE(THREE);
     }
+
+    _renderModelCallback = (userSocketID, data) => {
+        // console.log("Running renderModel() for ", userSocketID);
+        if (userSocketID && data) {
+            if (this.loadUserOnJoin) {
+                this.loadUser(userSocketID, data);
+            }
+        }
+    };
+    renderModel = () => {};
 
     onUserJoined(callback) {
         this.socket.on('userJoined', (userSocketID, data) => {
-            console.log(data.roomCode);
+            this.renderModel = () => { this._renderModelCallback(userSocketID, data); };
+            // console.log("Converted renderModel() to ", userSocketID);
+
             this.socket.emit('getConnectedUsers', data.roomCode); // This will update connectedUsers.
 
-            callback(userSocketID);
+            this._userJoinCallback = callback(userSocketID, data);
+        });
+    }
+
+    onUserLeft(callback) {
+        this.socket.on('userLeft', (userSocketID, data) => {
+            this.socket.emit('getConnectedUsers', data.roomCode); // This will update connectedUsers.
+
+            if (this.unloadUserOnLeave) {
+                this.unloadUser(userSocketID);
+            }
+
+            this._userLeftCallback = callback(userSocketID, data);
         });
     }
 
     loadUser(userSocketID) {
         let userInfo = this.connectedUsers[userSocketID];
-        console.log(userInfo);
 
-        // Load the user in Three.js
-        let socketID = userInfo.socketID;
-        let vrmURL = userInfo.data.vrmURL;
-        let name = userInfo.data.name;
+        if (userInfo && userSocketID) {
+            console.log("Loading " + userSocketID + "...");
 
-        this.kalidokit.loadUser(socketID, vrmURL, name);
+            // Load the user in Three.js
+            let socketID = userInfo.socketID;
+            let vrmURL = userInfo.data.vrmURL;
+            let name = userInfo.data.name;
 
-        var kalidokit = this.kalidokit;
+            this.kalidokit.loadUser(socketID, vrmURL, name);
+        }
+    }
 
-        this.socket.on('sentMPResults', function (results, socketID) {
-            // console.log(results);
-            this.on('sentRiggedData', function (riggedData) {
-                // console.log(kalidokit.virtualModels, socketID);
-                if (kalidokit && kalidokit.virtualModels[socketID]) {
-                    kalidokit.virtualModels[socketID].riggedCharacter = riggedData;
-                    kalidokit.onResults(results, socketID);
-                }
-            });
-        });
+    unloadUser(userSocketID) {
+        if (userSocketID) {
+            console.log("Unloaded " + userSocketID + "...");
+            this.kalidokit.unloadUser(userSocketID);
+        } else {
+            // User is not even loaded?
+        }
     }
 
     onThreeSetUp(callback) {

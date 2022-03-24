@@ -124,11 +124,29 @@
             data.roomCode = roomCode;
 
             if (vrmURL) {
+                // Generate a code for the user.
+                var generatedCode = (function makeID(length) {
+                    var result = '';
+                    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    var charactersLength = characters.length;
+                    for (var i = 0; i < length; i++) {
+                        result += characters.charAt(Math.floor(Math.random() *
+                            charactersLength));
+                    }
+                    return result;
+                })(5);
+
+                data.generatedCode = generatedCode;
+
                 // Assign the emit to the room.
                 embodiedVR.joinRoom(roomCode, data);
 
                 let roomURL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/room.html#" + roomCode;
                 document.getElementById("error-message").innerHTML = "Open this link in a new window (not a tab): <br /> <code>" + roomURL + "</code>";
+                document.getElementById("error-message").innerText += "Your generated code is: " + generatedCode;
+
+                document.getElementById("welcome-message").style.display = "none";
+                document.getElementById("enter-button").style.display = "none";
             } else {
                 document.getElementById("error-message").innerText = "Please select a model!";
             }

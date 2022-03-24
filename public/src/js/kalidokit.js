@@ -55,10 +55,12 @@ export class KalidoKit {
             this.renderer.xr.enabled = true;
 
             document.getElementById("VRButton").addEventListener('click', () => {
-                var selectedObject = scene.getObjectByName(this.loggedInUser);
-                this.camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                this.camera.y += 1.0; // Move a little away from the face.
-                selectedObject.add(camera);
+                var selectedObject = this.scene.getObjectByName(this.loggedInUser);
+                if (selectedObject) {
+                    this.camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
+                    this.camera.y += 1.0; // Move a little away from the face.
+                    selectedObject.add(this.camera);
+                }
             });
         }
     }
@@ -73,8 +75,9 @@ export class KalidoKit {
                     object.name = socketID;
 
                     object.scale.set(3, 3, 3);
-                    object.position.y = 0.5;
-                    object.position.z = -25.0;
+
+                    object.position.y = /* position.y; */ 0.5;
+                    object.position.z = /* position.z; */ -25.0;
                     this.scene.add(object);
 
                     this.virtualModels[socketID] = {};
@@ -82,7 +85,7 @@ export class KalidoKit {
                     this.virtualModels[socketID].vrm = vrm;
 
                     vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                    vrm.scene.position.x = 0.0;
+                    vrm.scene.position.x = /* position.x; */ 0.0;
                 });
             },
             progress =>
@@ -95,10 +98,16 @@ export class KalidoKit {
         );
     }
 
+    unloadUser(socketID, userName) {
+        var selectedObject = this.scene.getObjectByName(socketID);
+        this.scene.remove(selectedObject);
+    }
+
     onResults(results, socketID) {
         this.currentVrm = this.virtualModels[socketID].vrm;
         currentVrm = this.currentVrm;
         virtualModels = this.virtualModels;
+
         animateVRM(this.currentVrm, results, socketID);
     }
 
@@ -111,13 +120,13 @@ export class KalidoKit {
         remap = kalidokitLibrary.Utils.remap;
         clamp = kalidokitLibrary.Utils.clamp;
         lerp = kalidokitLibrary.Vector.lerp;
-        console.log(kalidokitLibrary);
+        // console.log(kalidokitLibrary);
     }
 
     sendTHREE(threeObject) {
         threeLibrary = threeObject;
         oldLookTarget = new threeLibrary.Euler();
-        console.log(threeObject);
+        // console.log(threeObject);
     }
 
 }
@@ -167,8 +176,12 @@ const rigPosition = (
     Part.position.lerp(vector, lerpAmount); // interpolate
 };
 
-let oldLookTarget = new THREE.Euler();
+let oldLookTarget;
 const rigFace = (riggedFace) => {
+    if (!oldLookTarget) {
+        oldLookTarget = new threeLibrary.Euler();
+    }
+
     if (!currentVrm) { return }
     rigRotation("Neck", riggedFace.head);
 
@@ -210,6 +223,8 @@ const animateVRM = (vrm, results, sID) => {
     if (!vrm) {
         return;
     }
+
+    console.log("Animating ", sID);
 
     const faceLandmarks = results.faceLandmarks;
     // Pose 3D Landmarks are with respect to Hip distance in meters

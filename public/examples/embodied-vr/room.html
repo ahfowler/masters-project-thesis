@@ -24,122 +24,168 @@
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"
         integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
         crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="./index.css">
+    <script>
+        var enterRoom;
+    </script>
 </head>
 
 <body>
+    <div id="enter-room">
+        <p>Please enter your generated code:</p>
+        <input type="text" id="user-code-input"></input>
+        <a id="enter-button" onclick="enterRoom()">Enter</a>
+    </div>
     <script type="module">
         import { VirtualRealityRoom } from "../../src/js/virtualreality.js";
 
-        let roomNumber = window.location.hash.substring(1);
-        if (roomNumber) {
-            document.title = "Room " + roomNumber;
-            var currentRoom = new VirtualRealityRoom(roomNumber, (renderer, scene, camera) => {
-                console.log("Set up the scene...");
-                scene.background = new THREE.Color("#ff0000");
+        var circlePoints;
+        var circlePointIndex = 0;
+        var currentPosition;
 
-                let cameraControls;
-                let groundMirror, verticalMirror;
-                let geometry, material;
+        enterRoom = function enterRoom() {
+            let generatedCode = document.getElementById("user-code-input").value;
+            document.getElementById("enter-room").style.display = "none";
 
-                camera.position.set(0, 3.0, 2.0);
+            let roomNumber = window.location.hash.substring(1);
 
-                cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-                cameraControls.target.set(0, 3.0, -25.0);
-                cameraControls.maxDistance = 400;
-                cameraControls.minDistance = 5;
-                cameraControls.update();
+            if (roomNumber) {
+                document.title = "Room " + roomNumber;
+                var currentRoom = new VirtualRealityRoom(roomNumber, generatedCode, (renderer, scene, camera) => {
+                    console.log("Set up the scene...");
+                    scene.background = new THREE.Color("#ff0000");
 
-                const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
+                    let cameraControls;
+                    let groundMirror, verticalMirror;
+                    let geometry, material;
 
-                // reflectors/mirrors
+                    camera.position.set(0, 3.0, 2.0);
 
-                geometry = new THREE.CircleGeometry(30, 30);
-                groundMirror = new THREE.Reflector(geometry, {
-                    clipBias: 0.003,
-                    textureWidth: window.innerWidth * window.devicePixelRatio,
-                    textureHeight: window.innerHeight * window.devicePixelRatio,
-                    color: 0x777777
+                    cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+                    cameraControls.target.set(0, 3.0, -25.0);
+                    cameraControls.maxDistance = 400;
+                    cameraControls.minDistance = 5;
+                    cameraControls.update();
+
+                    const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
+
+                    // reflectors/mirrors
+
+                    geometry = new THREE.CircleGeometry(30, 30);
+                    groundMirror = new THREE.Reflector(geometry, {
+                        clipBias: 0.003,
+                        textureWidth: window.innerWidth * window.devicePixelRatio,
+                        textureHeight: window.innerHeight * window.devicePixelRatio,
+                        color: 0x777777
+                    });
+                    groundMirror.position.y = 0.5;
+                    groundMirror.rotateX(- Math.PI / 2);
+                    scene.add(groundMirror);
+
+                    geometry = new THREE.PlaneGeometry(100, 100);
+                    verticalMirror = new THREE.Reflector(geometry, {
+                        clipBias: 0.003,
+                        textureWidth: window.innerWidth * window.devicePixelRatio,
+                        textureHeight: window.innerHeight * window.devicePixelRatio,
+                        color: 0x889999
+                    });
+                    verticalMirror.position.y = 50;
+                    verticalMirror.position.z = - 30;
+                    scene.add(verticalMirror);
+
+                    // walls
+                    const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: "orange" }));
+                    planeTop.position.y = 100;
+                    planeTop.rotateX(Math.PI / 2);
+                    scene.add(planeTop);
+
+                    const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xffffff }));
+                    planeBottom.rotateX(- Math.PI / 2);
+                    scene.add(planeBottom);
+
+                    const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x7f7fff }));
+                    planeFront.position.z = 50;
+                    planeFront.position.y = 50;
+                    planeFront.rotateY(Math.PI);
+                    scene.add(planeFront);
+
+                    const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+                    planeRight.position.x = 50;
+                    planeRight.position.y = 50;
+                    planeRight.rotateY(- Math.PI / 2);
+                    scene.add(planeRight);
+
+                    const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+                    planeLeft.position.x = - 50;
+                    planeLeft.position.y = 50;
+                    planeLeft.rotateY(Math.PI / 2);
+                    scene.add(planeLeft);
+
+                    // lights
+                    const mainLight = new THREE.PointLight(0xcccccc, 1.5, 250);
+                    mainLight.position.y = 60;
+                    scene.add(mainLight);
+
+                    const greenLight = new THREE.PointLight(0x00ff00, 0.25, 1000);
+                    greenLight.position.set(550, 50, 0);
+                    scene.add(greenLight);
+
+                    const redLight = new THREE.PointLight(0xff0000, 0.25, 1000);
+                    redLight.position.set(- 550, 50, 0);
+                    scene.add(redLight);
+
+                    const blueLight = new THREE.PointLight(0x7f7fff, 0.25, 1000);
+                    blueLight.position.set(0, 50, 550);
+                    scene.add(blueLight);
+
+                    function animate() {
+                        renderer.setAnimationLoop(animate);
+                        // requestAnimationFrame(animate);
+
+                        // if (currentVrm) {
+                        //     // Update model to render physics
+                        //     currentVrm.update(clock.getDelta());
+                        // }
+
+                        renderer.render(scene, camera);
+                    }
+                    animate();
                 });
-                groundMirror.position.y = 0.5;
-                groundMirror.rotateX(- Math.PI / 2);
-                scene.add(groundMirror);
 
-                geometry = new THREE.PlaneGeometry(100, 100);
-                verticalMirror = new THREE.Reflector(geometry, {
-                    clipBias: 0.003,
-                    textureWidth: window.innerWidth * window.devicePixelRatio,
-                    textureHeight: window.innerHeight * window.devicePixelRatio,
-                    color: 0x889999
+                currentRoom.loadUserOnJoin = true;
+                currentRoom.unloadUserOnLeave = true;
+                
+                circlePoints = calculateCirclePoints(currentRoom.connectedUsers.length, 10, { x: 0, y: 0 });
+                currentPosition = circlePoints[circlePointIndex];
+
+                currentRoom.onUserJoined((userSocketID) => {
+                    // Update the circle position.
+                    circlePointIndex++;
                 });
-                verticalMirror.position.y = 50;
-                verticalMirror.position.z = - 30;
-                scene.add(verticalMirror);
 
-                // walls
-                const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: "orange" }));
-                planeTop.position.y = 100;
-                planeTop.rotateX(Math.PI / 2);
-                scene.add(planeTop);
+                currentRoom.onUserLeft((userSocketID) => {
+                    // Update the circle position.
+                    circlePointIndex--;
+                });
+            } else {
+                // This is not a specific room?
+            }
+        };
 
-                const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                planeBottom.rotateX(- Math.PI / 2);
-                scene.add(planeBottom);
-
-                const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x7f7fff }));
-                planeFront.position.z = 50;
-                planeFront.position.y = 50;
-                planeFront.rotateY(Math.PI);
-                scene.add(planeFront);
-
-                const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
-                planeRight.position.x = 50;
-                planeRight.position.y = 50;
-                planeRight.rotateY(- Math.PI / 2);
-                scene.add(planeRight);
-
-                const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xff0000 }));
-                planeLeft.position.x = - 50;
-                planeLeft.position.y = 50;
-                planeLeft.rotateY(Math.PI / 2);
-                scene.add(planeLeft);
-
-                // lights
-                const mainLight = new THREE.PointLight(0xcccccc, 1.5, 250);
-                mainLight.position.y = 60;
-                scene.add(mainLight);
-
-                const greenLight = new THREE.PointLight(0x00ff00, 0.25, 1000);
-                greenLight.position.set(550, 50, 0);
-                scene.add(greenLight);
-
-                const redLight = new THREE.PointLight(0xff0000, 0.25, 1000);
-                redLight.position.set(- 550, 50, 0);
-                scene.add(redLight);
-
-                const blueLight = new THREE.PointLight(0x7f7fff, 0.25, 1000);
-                blueLight.position.set(0, 50, 550);
-                scene.add(blueLight);
-
-                function animate() {
-                    renderer.setAnimationLoop(animate);
-                    // requestAnimationFrame(animate);
-
-                    // if (currentVrm) {
-                    //     // Update model to render physics
-                    //     currentVrm.update(clock.getDelta());
-                    // }
-
-                    renderer.render(scene, camera);
-                }
-                animate();
-            });
-
-            currentRoom.onUserJoined((userSocketID) => {
-                currentRoom.loadUser(userSocketID);
-            });
-        } else {
-            // This is not a specific room?
+        function calculateCirclePoints(numberPoints, radius, center) {
+            let circlePoints = [];
+            var slice = 2 * Math.PI / numberPoints;
+            for (var i = 0; i < numberPoints; i++) {
+                var angle = slice * i;
+                var newX = (center.x + radius * Math.Cos(angle));
+                var newY = (center.y + radius * Math.Sin(angle));
+                var point = { x: newX, y: 0.0, z: newY };
+                circlePoints.push(point);
+            }
+            return circlePoints;
         }
+
     </script>
 </body>
 

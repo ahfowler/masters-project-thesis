@@ -143,17 +143,25 @@ app.get('/', (req, res) => {
 // });
 
 // Methods -----------------------------------------------------------------------------------------------------------
+var allClients = [];
+
 // When a user joins a room, assign them to the room.
 io.on('connection', (socket) => {
+    allClients.push(socket);
+
     socket.on('joinRoom', (roomNumber, data) => {
         try {
+            socket.clientType = "user";
+            socket.roomNumber = roomNumber;
+            socket.data = data;
+
             console.log(data.name + " " + socket.id + " has joined room: " + roomNumber)
             socket.join(roomNumber);
 
             updateClassroomData(socket.id, data, () => {
                 // Notify the room you joined!
                 io.in(roomNumber).emit('userJoined', socket.id, data);
-            });
+            }, false);
         } catch (e) {
             console.log('[error]', 'join room :', e);
             socket.emit('error', 'couldnt perform requested action');
@@ -162,6 +170,9 @@ io.on('connection', (socket) => {
 
     socket.on('connectClassroom', (roomNumber) => {
         try {
+            socket.clientType = "classroom";
+            socket.roomNumber = roomNumber;
+
             socket.join(roomNumber);
             console.log("classroom " + socket.id + " " + roomNumber + " is online");
 
@@ -180,6 +191,47 @@ io.on('connection', (socket) => {
         getConnectedUsers(roomNumber, (connectedUsers) => {
             io.in(roomNumber).emit('sentConnectedUsers', connectedUsers);
         });
+    });
+
+    socket.on('disconnect', () => {
+        if (socket.clientType == "user" && socket.roomNumber && socket.data) { // A user disconnected...
+            console.log(socket.roomNumber, socket.data);
+
+            let roomNumber = socket.roomNumber;
+            let data = socket.data;
+            
+            try {
+                console.log(data.name + " " + socket.id + " has left room: " + roomNumber)
+                socket.leave(roomNumber);
+    
+                updateClassroomData(socket.id, data, () => {
+                    // Notify the room you joined!
+                    io.in(roomNumber).emit('userLeft', socket.id, data);
+                }, true);
+            } catch (e) {
+                console.log('[error]', 'leave room :', e);
+                socket.emit('error', 'couldnt perform requested action');
+            }
+
+        } else if (socket.clientType == "classroom") { // A classroom viewer disconnected...
+
+        }
+        
+    });
+
+    socket.on('leaveRoom', (roomNumber, data) => {
+        try {
+            console.log(data.name + " " + socket.id + " has left room: " + roomNumber)
+            socket.leave(roomNumber);
+
+            updateClassroomData(socket.id, data, () => {
+                // Notify the room you joined!
+                io.in(roomNumber).emit('userLeft', socket.id, data);
+            }, true);
+        } catch (e) {
+            console.log('[error]', 'leave room :', e);
+            socket.emit('error', 'couldnt perform requested action');
+        }
     });
 })
 
@@ -209,20 +261,26 @@ server.listen(PORT, console.log(
     `Server started on port ${PORT}`));
 
 
-function updateClassroomData(userSocketID, userData, callback) {
+function updateClassroomData(userSocketID, userData, callback, remove) {
     fs.readFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', 'utf8', function readFileCallback(err, data) {
         if (err) {
             console.log(err);
         } else {
             var rooms = JSON.parse(data);
 
-            if (rooms[userData.roomCode] == undefined) {
-                rooms[userData.roomCode] = {};
+            if (!remove) {
+                if (rooms[userData.roomCode] == undefined) {
+                    rooms[userData.roomCode] = {};
+                }
+                // Update the model.
+                rooms[userData.roomCode][userSocketID] = {};
+                rooms[userData.roomCode][userSocketID].socketID = userSocketID;
+                rooms[userData.roomCode][userSocketID].data = userData;
+            } else {
+                if (rooms[userData.roomCode] != undefined) {
+                    delete rooms[userData.roomCode][userSocketID];
+                }
             }
-            // Update the model.
-            rooms[userData.roomCode][userSocketID] = {};
-            rooms[userData.roomCode][userSocketID].socketID = userSocketID;
-            rooms[userData.roomCode][userSocketID].data = userData;
 
             jsonString = JSON.stringify(rooms, null, 2);
             fs.writeFile('./public/examples/embodied-vr/virtual-classroom-data/connected-users.json', jsonString, 'utf8', () => { });
