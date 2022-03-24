@@ -1,22 +1,2 @@
 {
-  "1234": {
-    "Roo5XiXl5pLLMigOAAGl": {
-      "socketID": "Roo5XiXl5pLLMigOAAGl",
-      "data": {
-        "name": "sam",
-        "vrmURL": "../../assets/vrm-models/modelC.vrm",
-        "roomCode": "1234",
-        "generatedCode": "rN47g"
-      }
-    },
-    "r14A921ikz25J0HNAAGp": {
-      "socketID": "r14A921ikz25J0HNAAGp",
-      "data": {
-        "name": "Hi",
-        "vrmURL": "../../assets/vrm-models/modelB.vrm",
-        "roomCode": "1234",
-        "generatedCode": "oOfNZ"
-      }
-    }
-  }
 }
