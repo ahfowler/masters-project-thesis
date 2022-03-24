@@ -262,6 +262,8 @@ export class VirtualRealityRoom {
 
                 this.kalidokit.loadUser(socketID, vrmURL, name);
             }
+        } else {
+            console.log("Missed loading ", userSocketID);
         }
     }
 
