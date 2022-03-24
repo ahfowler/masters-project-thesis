@@ -1,3 +1,4 @@
+import { render } from "express/lib/response";
 import { VRButton } from "https://unpkg.com/three@0.133.0/examples/jsm/webxr/VRButton.js";
 // import { Utils } from "https://cdn.jsdelivr.net/npm/kalidokit@1.1.5/dist/index.min.js";
 
@@ -52,6 +53,8 @@ export class KalidoKit {
         this.loggedInUser = loggedInUser;
         if (this.loggedInUser) {
             document.body.appendChild(VRButton.createButton(this.renderer));
+            this.renderer.outputEncoding = THREE.sRGBEncoding;
+            this.renderer.shadowMap = true;
             this.renderer.xr.enabled = true;
 
             document.getElementById("VRButton").addEventListener('click', () => {
