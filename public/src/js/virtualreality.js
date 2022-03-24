@@ -87,7 +87,7 @@ export class VirtualRealityRoom {
     _userJoinCallback;
     _userLeftCallback;
 
-    constructor(roomNumber, loggedInUser, threeSetUp) {
+    constructor(roomNumber, loggedInUser, threeSetUp, onLoad) {
         this.roomNumber = roomNumber;
         this.socket = io();
 
@@ -98,7 +98,7 @@ export class VirtualRealityRoom {
             var data;
 
             if (!this.kalidokit) { // Updating the users for the first time...
-                if (loggedInUser) { // A user entered their generated code...
+                if (loggedInUser || loggedInUser != "") { // A user entered their generated code...
                     for (const socketID in this.connectedUsers) {
                         if (this.connectedUsers[socketID].data.generatedCode == loggedInUser) {
                             // console.log(this.connectedUsers[socketID].data.generatedCode, loggedInUser);
@@ -127,14 +127,65 @@ export class VirtualRealityRoom {
                         }
                     }
 
+                    // Load the viewing user.
                     if (this.loadUserOnJoin) {
                         this.loadUser(userSocketID, data);
                     }
+
+                    // Load the other users.
+                    for (const socketID in this.connectedUsers) {
+                        if (socketID != userSocketID) {
+                            let otherUserSocketID = socketID;
+                            let otherUserdata = this.connectedUsers[socketID].data;
+
+                            if (this.loadUserOnJoin) {
+                                this.loadUser(otherUserSocketID, otherUserdata);
+                            }
+                        }
+                    }
+
+                    if (onLoad) {
+                        onLoad(this.kalidokit);
+                    }
                 } else { // A user is just viewing the room.
+                    // Step 1: Set up the THREE.js environment.
+                    this.kalidokit = new KalidoKit(null, threeSetUp);
+                    this.kalidokit.sendLibrary(Kalidokit);
+                    this.kalidokit.sendTHREE(THREE);
+
+                    // Step 2: Load the users.
+                    for (const socketID in this.connectedUsers) {
+                        // Step 2: Set up variables for callbacks.
+                        userSocketID = socketID;
+                        data = this.connectedUsers[socketID].data;
+
+                        if (this.loadUserOnJoin) {
+                            this.loadUser(userSocketID, data);
+                        }
+                    }
+
+                    // Step 3: Set up the results and rigging data.
+                    var kalidokit = this.kalidokit;
+
+                    this.socket.on('sentMPResults', function (results, socketID) {
+                        // console.log(results);
+                        this.on('sentRiggedData', function (riggedData, socketID) {
+                            // console.log(kalidokit.virtualModels, socketID);
+                            if (kalidokit && kalidokit.virtualModels[socketID]) {
+                                kalidokit.virtualModels[socketID].riggedCharacter = riggedData;
+                                kalidokit.onResults(results, socketID);
+                            }
+                        });
+                    });
+
+                    if (onLoad) {
+                        onLoad(this.kalidokit);
+                    }
 
                 }
 
                 if (this._userJoinCallback) {
+                    // console.log("Calling client made callback...");
                     this._userJoinCallback();
                 }
 
@@ -145,6 +196,7 @@ export class VirtualRealityRoom {
                 }
 
                 if (this._userJoinCallback) {
+                    // console.log("Calling client made callback...");
                     this._userJoinCallback();
                 }
 
@@ -167,28 +219,32 @@ export class VirtualRealityRoom {
             }
         }
     };
-    renderModel = () => {};
+    renderModel = () => { };
 
     onUserJoined(callback) {
+        this._userJoinCallback = callback;
+
         this.socket.on('userJoined', (userSocketID, data) => {
+            // this._userJoinCallback = callback;
+
             this.renderModel = () => { this._renderModelCallback(userSocketID, data); };
             // console.log("Converted renderModel() to ", userSocketID);
 
             this.socket.emit('getConnectedUsers', data.roomCode); // This will update connectedUsers.
-
-            this._userJoinCallback = callback(userSocketID, data);
         });
     }
 
     onUserLeft(callback) {
+        this._userLeftCallback = callback;
+
         this.socket.on('userLeft', (userSocketID, data) => {
+            // this._userLeftCallback = callback;
+
             this.socket.emit('getConnectedUsers', data.roomCode); // This will update connectedUsers.
 
             if (this.unloadUserOnLeave) {
                 this.unloadUser(userSocketID);
             }
-
-            this._userLeftCallback = callback(userSocketID, data);
         });
     }
 

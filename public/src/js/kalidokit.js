@@ -76,7 +76,7 @@ export class KalidoKit {
 
                     object.scale.set(3, 3, 3);
 
-                    object.position.y = /* position.y; */ 0.5;
+                    object.position.y = /* position.y; */ -100.00;
                     object.position.z = /* position.z; */ -25.0;
                     this.scene.add(object);
 
@@ -84,16 +84,17 @@ export class KalidoKit {
                     this.virtualModels[socketID].riggedCharacter = {};
                     this.virtualModels[socketID].vrm = vrm;
 
-                    vrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
+                    vrm.scene.rotation.y = 0.0; // Rotate model 180deg to face camera
                     vrm.scene.position.x = /* position.x; */ 0.0;
                 });
             },
-            progress =>
+            progress => {
                 console.log(
                     "Loading model...",
                     100.0 * (progress.loaded / progress.total),
                     "%"
-                ),
+                );
+            },
             error => console.error(error)
         );
     }

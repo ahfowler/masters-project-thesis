@@ -41,8 +41,7 @@
         import { VirtualRealityRoom } from "../../src/js/virtualreality.js";
 
         var circlePoints;
-        var circlePointIndex = 0;
-        var currentPosition;
+        let arrangeUsers;
 
         enterRoom = function enterRoom() {
             let generatedCode = document.getElementById("user-code-input").value;
@@ -60,12 +59,12 @@
                     let groundMirror, verticalMirror;
                     let geometry, material;
 
-                    camera.position.set(0, 3.0, 2.0);
+                    camera.position.set(0, 5.0, 20);
 
                     cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
-                    cameraControls.target.set(0, 3.0, -25.0);
-                    cameraControls.maxDistance = 400;
-                    cameraControls.minDistance = 5;
+                    cameraControls.target.set(0, 3.0, 0);
+                    // cameraControls.maxDistance = 500;
+                    // cameraControls.minDistance = 5;
                     cameraControls.update();
 
                     const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
@@ -151,22 +150,56 @@
                         renderer.render(scene, camera);
                     }
                     animate();
+                }, (kalidokitObject) => {
+                    arrangeUsers = () => {
+                        console.log(currentRoom.connectedUsers);
+                        // Step 1: Get all the socketIDs from the connected user.
+                        let connectedUsers = Object.keys(currentRoom.connectedUsers)
+
+                        // Step 2: Calculate positions for each user.
+                        circlePoints = calculateCirclePoints(connectedUsers.length, 3, { x: 0, y: 0 });
+
+                        console.log("Circle points...", circlePoints);
+
+                        setTimeout(function () {
+                            for (var i = 0; i < connectedUsers.length; i++) {
+                                // console.log("Loading these users...", currentRoom.connectedUsers[i]);
+                                var newUser = kalidokitObject.scene.getObjectByName(connectedUsers[i]);
+                                // console.log(connectedUsers[i], kalidokitObject.scene.children, newUser);
+
+                                newUser.rotation.set(0, 0, 0);
+                                newUser.position.x = 0.0;
+                                newUser.position.y = 0.0;
+                                newUser.position.z = 0.0;
+
+                                newUser.rotation.y = circlePoints[i].rotation + Math.PI;
+
+                                newUser.position.x = circlePoints[i].x;
+                                newUser.position.y = circlePoints[i].y;
+                                newUser.position.z = circlePoints[i].z;
+
+                                // console.log("Rotating model ", i, newUser.rotation.y);
+
+                            }
+                        }, 6000);
+                    };
+                    arrangeUsers();
                 });
 
                 currentRoom.loadUserOnJoin = true;
                 currentRoom.unloadUserOnLeave = true;
-                
-                circlePoints = calculateCirclePoints(currentRoom.connectedUsers.length, 10, { x: 0, y: 0 });
-                currentPosition = circlePoints[circlePointIndex];
 
                 currentRoom.onUserJoined((userSocketID) => {
-                    // Update the circle position.
-                    circlePointIndex++;
+                    if (arrangeUsers) {
+                        arrangeUsers();
+                    }
                 });
 
                 currentRoom.onUserLeft((userSocketID) => {
-                    // Update the circle position.
-                    circlePointIndex--;
+                    if (arrangeUsers) {
+                        arrangeUsers();
+                    }
+
                 });
             } else {
                 // This is not a specific room?
@@ -174,15 +207,40 @@
         };
 
         function calculateCirclePoints(numberPoints, radius, center) {
+            console.log(numberPoints, radius, center);
             let circlePoints = [];
-            var slice = 2 * Math.PI / numberPoints;
-            for (var i = 0; i < numberPoints; i++) {
-                var angle = slice * i;
-                var newX = (center.x + radius * Math.Cos(angle));
-                var newY = (center.y + radius * Math.Sin(angle));
-                var point = { x: newX, y: 0.0, z: newY };
+
+            if (numberPoints < 2) {
+                var point = { x: 0.0, y: 0.5, z: 0.0, rotation: 0.0 };
                 circlePoints.push(point);
+            } else {
+                var slice = 2 * Math.PI / numberPoints;
+                for (var i = 0; i < numberPoints; i++) {
+                    var angle = slice * i;
+                    var newX = center.x + radius * Math.cos(angle);
+                    var newY = center.y + radius * Math.sin(angle);
+                    // console.log(angle, newX, newY);
+                    var point = { x: newX, y: 0.5, z: newY, rotation: slice * i };
+                    circlePoints.push(point);
+                }
             }
+
+            Array.prototype.swap = function (a, b) {
+                var tempX = this[a].x;
+                var tempY = this[a].z;
+
+                this[a].x = this[b].x;
+                this[a].z = this[b].z;
+
+                this[b].x = tempX;
+                this[b].z = tempY;
+                return this;
+            };
+
+            circlePoints = circlePoints.swap(0, numberPoints - 1);
+
+
+
             return circlePoints;
         }
 
