@@ -54,6 +54,10 @@ export class KalidoKit {
             document.body.appendChild(VRButton.createButton(this.renderer));
             this.renderer.xr.enabled = true;
 
+            document.getElementById("VRButton").style.display = "absolute";
+            document.getElementById("VRButton").style.top = "20px";
+            document.getElementById("VRButton").style.left = "20px";
+
             document.getElementById("VRButton").addEventListener('click', () => {
                 var selectedObject = this.scene.getObjectByName(this.loggedInUser);
                 if (selectedObject) {
