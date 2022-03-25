@@ -35,7 +35,7 @@ export class KalidoKit {
         document.body.appendChild(this.renderer.domElement);
 
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 400);
+        this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 5000);
 
         this.clock = new THREE.Clock();
 
@@ -61,9 +61,20 @@ export class KalidoKit {
             document.getElementById("VRButton").addEventListener('click', () => {
                 var selectedObject = this.scene.getObjectByName(this.loggedInUser);
                 if (selectedObject) {
-                    this.camera.rotation.y = Math.PI; // Rotate model 180deg to face camera
-                    this.camera.y += 1.0; // Move a little away from the face.
-                    selectedObject.add(this.camera);
+                    // Create a dolly.
+                    this.dolly = new THREE.Group();
+                    this.dolly.add(this.camera);
+                    this.scene.add(this.dolly);
+
+                    // Update the dolly.
+                    this.camera.near = 0.25;
+                    this.camera.fov = 30;
+                    this.camera.far = 5000;
+
+                    this.dolly.position.z += 0.1;
+                    this.dolly.position.y -= 0.15;
+
+                    selectedObject.add(this.dolly);
                 }
             });
         }

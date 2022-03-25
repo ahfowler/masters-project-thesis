@@ -1,1 +1,13 @@
-{}
+{
+  "1234": {
+    "M8g1fW7g28laNEamAAAv": {
+      "socketID": "M8g1fW7g28laNEamAAAv",
+      "data": {
+        "name": "Sandra Bullock",
+        "vrmURL": "../../assets/vrm-models/modelA.vrm",
+        "roomCode": "1234",
+        "generatedCode": "mpWDX"
+      }
+    }
+  }
+}
