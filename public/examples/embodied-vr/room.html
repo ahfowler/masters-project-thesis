@@ -172,27 +172,29 @@
                             // Step 2: Calculate positions for each user.
                             circlePoints = calculateCirclePoints(connectedUsers.length, 3, { x: 0, y: 0 });
 
+                            let allUsersLoaded = true;
                             // console.log("Circle points...", circlePoints);
-
-                            setTimeout(function () {
+                            const checkUsers = setInterval(function () {
                                 for (var i = 0; i < connectedUsers.length; i++) {
-                                    // console.log("Loading these users...", currentRoom.connectedUsers[i]);
                                     var newUser = kalidokitObject.scene.getObjectByName(connectedUsers[i]);
-                                    // console.log(connectedUsers[i], kalidokitObject.scene.children, newUser);
+                                    if (newUser) {
+                                        newUser.rotation.set(0, 0, 0);
+                                        newUser.position.x = 0.0;
+                                        newUser.position.y = 0.0;
+                                        newUser.position.z = 0.0;
 
-                                    newUser.rotation.set(0, 0, 0);
-                                    newUser.position.x = 0.0;
-                                    newUser.position.y = 0.0;
-                                    newUser.position.z = 0.0;
+                                        newUser.rotation.y = circlePoints[i].rotation + Math.PI;
 
-                                    newUser.rotation.y = circlePoints[i].rotation + Math.PI;
+                                        newUser.position.x = circlePoints[i].x;
+                                        newUser.position.y = circlePoints[i].y;
+                                        newUser.position.z = circlePoints[i].z;
+                                    } else {
+                                        allUsersLoaded = false;
+                                    }
+                                }
 
-                                    newUser.position.x = circlePoints[i].x;
-                                    newUser.position.y = circlePoints[i].y;
-                                    newUser.position.z = circlePoints[i].z;
-
-                                    // console.log("Rotating model ", i, newUser.rotation.y);
-
+                                if (allUsersLoaded) {
+                                    clearInterval(checkUsers);
                                 }
                             }, 10000);
                         }
