@@ -29,8 +29,9 @@ export class KalidoKit {
 
     constructor(loggedInUser, threeSetUp) {
         this.renderer = new THREE.WebGLRenderer({ alpha: true });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        // this.renderer.outputEncoding = THREE.sRGBEncoding;
         document.body.appendChild(this.renderer.domElement);
 
         this.scene = new THREE.Scene();
@@ -53,6 +54,9 @@ export class KalidoKit {
         if (this.loggedInUser) {
             document.body.appendChild(VRButton.createButton(this.renderer));
             this.renderer.xr.enabled = true;
+
+            document.getElementById("VRButton").style.bottom = "50%";
+            document.getElementById("VRButton").style.right = "50%";
 
             document.getElementById("VRButton").addEventListener('click', () => {
                 var selectedObject = this.scene.getObjectByName(this.loggedInUser);
@@ -225,7 +229,7 @@ const animateVRM = (vrm, results, sID) => {
         return;
     }
 
-    console.log("Animating ", sID);
+    // console.log("Animating ", sID);
 
     const faceLandmarks = results.faceLandmarks;
     // Pose 3D Landmarks are with respect to Hip distance in meters

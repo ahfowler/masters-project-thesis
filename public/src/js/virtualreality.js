@@ -91,6 +91,7 @@ export class VirtualRealityRoom {
         this.roomNumber = roomNumber;
         this.socket = io();
 
+        // This when everything should start.
         this.socket.on('sentConnectedUsers', (users) => {
             this.connectedUsers = users;
 

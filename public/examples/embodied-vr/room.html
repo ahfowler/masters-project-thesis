@@ -13,7 +13,7 @@
     <!-- Orbit Controls for Three.js -->
     <script src="https://unpkg.com/three@0.133.0/examples/js/controls/OrbitControls.js"></script>
     <!-- Reflector for Three.js -->
-    <script src="https://unpkg.com/three@0.133.0/examples/js/objects/Reflector.js"></script>
+    <script src="https://unpkg.com/three@0.132.0/examples/js/objects/Reflector.js"></script>
     <!-- VRM Loader for Three.js -->
     <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
 
@@ -53,7 +53,12 @@
                 document.title = "Room " + roomNumber;
                 var currentRoom = new VirtualRealityRoom(roomNumber, generatedCode, (renderer, scene, camera) => {
                     console.log("Set up the scene...");
-                    scene.background = new THREE.Color(0xFFFFFF);
+                    // scene.background = new THREE.Color(0xFFFFFF);
+
+                    var viewport = camera.viewport;
+                    if (viewport !== undefined) {
+                        renderer.state.viewport(viewport);
+                    }
 
                     let cameraControls;
                     let groundMirror, verticalMirror;
@@ -70,52 +75,57 @@
                     const planeGeo = new THREE.PlaneGeometry(100.1, 100.1);
 
                     // reflectors/mirrors
-                    // geometry = new THREE.CircleGeometry(30, 30);
-                    // groundMirror = new THREE.Reflector(geometry, {
-                    //     clipBias: 0.003,
-                    //     textureWidth: window.innerWidth * window.devicePixelRatio,
-                    //     textureHeight: window.innerHeight * window.devicePixelRatio,
-                    //     color: 0x889999
-                    // });
-                    // groundMirror.position.y = 0.5;
-                    // groundMirror.rotateX(- Math.PI / 2);
-                    // scene.add(groundMirror);
+                    // Reflector does not work on mobile...
 
-                    // geometry = new THREE.PlaneGeometry(100, 100);
-                    // verticalMirror = new THREE.Reflector(geometry, {
-                    //     clipBias: 0.003,
-                    //     textureWidth: window.innerWidth * window.devicePixelRatio,
-                    //     textureHeight: window.innerHeight * window.devicePixelRatio,
-                    //     color: 0x889999
-                    // });
+                    verticalMirror = new THREE.Reflector(planeGeo, {
+                        textureWidth: window.innerWidth * window.devicePixelRatio,
+                        textureHeight: window.innerHeight * window.devicePixelRatio
+                    });
 
-                    // verticalMirror.position.y = 50;
-                    // verticalMirror.position.z = - 30;
-                    // scene.add(verticalMirror);
+                    verticalMirror.position.y = 50;
+                    verticalMirror.position.z = -20;
+                    scene.add(verticalMirror);
 
                     // walls
-                    const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: "orange" }));
+                    const planeBack = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0x333333,
+                    }));
+                    planeBack.position.y = 50;
+                    planeBack.position.z = -50;
+                    scene.add(planeBack);
+
+                    const planeTop = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0xEEEEEE,
+                    }));
                     planeTop.position.y = 100;
                     planeTop.rotateX(Math.PI / 2);
                     scene.add(planeTop);
 
-                    const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xffffff }));
+                    const planeBottom = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0xEEEEEE,
+                    }));
                     planeBottom.rotateX(- Math.PI / 2);
                     scene.add(planeBottom);
 
-                    const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x7f7fff }));
+                    const planeFront = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0xEEEEEE,
+                    }));
                     planeFront.position.z = 50;
                     planeFront.position.y = 50;
                     planeFront.rotateY(Math.PI);
                     scene.add(planeFront);
 
-                    const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+                    const planeRight = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0xEEEEEE,
+                    }));
                     planeRight.position.x = 50;
                     planeRight.position.y = 50;
                     planeRight.rotateY(- Math.PI / 2);
                     scene.add(planeRight);
 
-                    const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+                    const planeLeft = new THREE.Mesh(planeGeo, new THREE.MeshStandardMaterial({
+                        color: 0xEEEEEE,
+                    }));
                     planeLeft.position.x = - 50;
                     planeLeft.position.y = 50;
                     planeLeft.rotateY(Math.PI / 2);
@@ -126,15 +136,15 @@
                     mainLight.position.y = 60;
                     scene.add(mainLight);
 
-                    const greenLight = new THREE.PointLight(0x00ff00, 0.25, 1000);
+                    const greenLight = new THREE.PointLight(0xEEEEEE, 0.25, 1000);
                     greenLight.position.set(550, 50, 0);
                     scene.add(greenLight);
 
-                    const redLight = new THREE.PointLight(0xff0000, 0.25, 1000);
+                    const redLight = new THREE.PointLight(0xEEEEEE, 0.25, 1000);
                     redLight.position.set(- 550, 50, 0);
                     scene.add(redLight);
 
-                    const blueLight = new THREE.PointLight(0x7f7fff, 0.25, 1000);
+                    const blueLight = new THREE.PointLight(0xEEEEEE, 0.25, 1000);
                     blueLight.position.set(0, 50, 550);
                     scene.add(blueLight);
 
@@ -142,24 +152,26 @@
                         renderer.setAnimationLoop(animate);
                         // requestAnimationFrame(animate);
 
-                        // if (currentVrm) {
-                        //     // Update model to render physics
-                        //     currentVrm.update(clock.getDelta());
-                        // }
+                        if (currentRoom && currentRoom.kalidokit && currentRoom.kalidokit.currentVrm) {
+                            // Update model to render physics
+                            currentRoom.kalidokit.currentVrm.update(currentRoom.kalidokit.clock.getDelta());
+                        }
 
                         renderer.render(scene, camera);
                     }
                     animate();
                 }, (kalidokitObject) => {
+                    // This is called when the VirtualRealityRoom is created. (Connected users may not be loaded yet.)
+
                     arrangeUsers = () => {
-                        console.log(currentRoom.connectedUsers);
+                        // console.log(currentRoom.connectedUsers);
                         // Step 1: Get all the socketIDs from the connected user.
                         let connectedUsers = Object.keys(currentRoom.connectedUsers)
 
                         // Step 2: Calculate positions for each user.
                         circlePoints = calculateCirclePoints(connectedUsers.length, 3, { x: 0, y: 0 });
 
-                        console.log("Circle points...", circlePoints);
+                        // console.log("Circle points...", circlePoints);
 
                         setTimeout(function () {
                             for (var i = 0; i < connectedUsers.length; i++) {
@@ -181,33 +193,33 @@
                                 // console.log("Rotating model ", i, newUser.rotation.y);
 
                             }
-                        }, 6000);
+                        }, 10000);
                     };
                     arrangeUsers();
+
+                    currentRoom.onUserJoined((userSocketID) => {
+                        if (arrangeUsers) {
+                            arrangeUsers();
+                        }
+                    });
+
+                    currentRoom.onUserLeft((userSocketID) => {
+                        if (arrangeUsers) {
+                            arrangeUsers();
+                        }
+
+                    });
                 });
 
                 currentRoom.loadUserOnJoin = true;
                 currentRoom.unloadUserOnLeave = true;
-
-                currentRoom.onUserJoined((userSocketID) => {
-                    if (arrangeUsers) {
-                        arrangeUsers();
-                    }
-                });
-
-                currentRoom.onUserLeft((userSocketID) => {
-                    if (arrangeUsers) {
-                        arrangeUsers();
-                    }
-
-                });
             } else {
                 // This is not a specific room?
             }
         };
 
         function calculateCirclePoints(numberPoints, radius, center) {
-            console.log(numberPoints, radius, center);
+            // console.log(numberPoints, radius, center);
             let circlePoints = [];
 
             if (numberPoints < 2) {
