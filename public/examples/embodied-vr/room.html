@@ -164,36 +164,38 @@
                     // This is called when the VirtualRealityRoom is created. (Connected users may not be loaded yet.)
 
                     arrangeUsers = () => {
-                        // console.log(currentRoom.connectedUsers);
-                        // Step 1: Get all the socketIDs from the connected user.
-                        let connectedUsers = Object.keys(currentRoom.connectedUsers)
+                        if (currentRoom && currentRoom.connectedUsers) {
+                            // console.log(currentRoom.connectedUsers);
+                            // Step 1: Get all the socketIDs from the connected user.
+                            let connectedUsers = Object.keys(currentRoom.connectedUsers)
 
-                        // Step 2: Calculate positions for each user.
-                        circlePoints = calculateCirclePoints(connectedUsers.length, 3, { x: 0, y: 0 });
+                            // Step 2: Calculate positions for each user.
+                            circlePoints = calculateCirclePoints(connectedUsers.length, 3, { x: 0, y: 0 });
 
-                        // console.log("Circle points...", circlePoints);
+                            // console.log("Circle points...", circlePoints);
 
-                        setTimeout(function () {
-                            for (var i = 0; i < connectedUsers.length; i++) {
-                                // console.log("Loading these users...", currentRoom.connectedUsers[i]);
-                                var newUser = kalidokitObject.scene.getObjectByName(connectedUsers[i]);
-                                // console.log(connectedUsers[i], kalidokitObject.scene.children, newUser);
+                            setTimeout(function () {
+                                for (var i = 0; i < connectedUsers.length; i++) {
+                                    // console.log("Loading these users...", currentRoom.connectedUsers[i]);
+                                    var newUser = kalidokitObject.scene.getObjectByName(connectedUsers[i]);
+                                    // console.log(connectedUsers[i], kalidokitObject.scene.children, newUser);
 
-                                newUser.rotation.set(0, 0, 0);
-                                newUser.position.x = 0.0;
-                                newUser.position.y = 0.0;
-                                newUser.position.z = 0.0;
+                                    newUser.rotation.set(0, 0, 0);
+                                    newUser.position.x = 0.0;
+                                    newUser.position.y = 0.0;
+                                    newUser.position.z = 0.0;
 
-                                newUser.rotation.y = circlePoints[i].rotation + Math.PI;
+                                    newUser.rotation.y = circlePoints[i].rotation + Math.PI;
 
-                                newUser.position.x = circlePoints[i].x;
-                                newUser.position.y = circlePoints[i].y;
-                                newUser.position.z = circlePoints[i].z;
+                                    newUser.position.x = circlePoints[i].x;
+                                    newUser.position.y = circlePoints[i].y;
+                                    newUser.position.z = circlePoints[i].z;
 
-                                // console.log("Rotating model ", i, newUser.rotation.y);
+                                    // console.log("Rotating model ", i, newUser.rotation.y);
 
-                            }
-                        }, 10000);
+                                }
+                            }, 10000);
+                        }
                     };
                     arrangeUsers();
 

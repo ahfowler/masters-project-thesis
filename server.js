@@ -199,11 +199,11 @@ io.on('connection', (socket) => {
 
             let roomNumber = socket.roomNumber;
             let data = socket.data;
-            
+
             try {
                 console.log(data.name + " " + socket.id + " has left room: " + roomNumber)
                 socket.leave(roomNumber);
-    
+
                 updateClassroomData(socket.id, data, () => {
                     // Notify the room you joined!
                     io.in(roomNumber).emit('userLeft', socket.id, data);
@@ -216,7 +216,7 @@ io.on('connection', (socket) => {
         } else if (socket.clientType == "classroom") { // A classroom viewer disconnected...
 
         }
-        
+
     });
 
     socket.on('leaveRoom', (roomNumber, data) => {
@@ -296,7 +296,9 @@ function getConnectedUsers(roomNumber, callback) {
         } else {
             var rooms = JSON.parse(data);
             var usersInRoom = rooms[roomNumber];
-            callback(usersInRoom);
+            if (usersInRoom) {
+                callback(usersInRoom);
+            }
         }
     });
 }
