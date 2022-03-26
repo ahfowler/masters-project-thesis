@@ -105,7 +105,7 @@
 
         chooseModel = function chooseModel(modelName) {
             vrmURL = "../../assets/vrm-models/" + modelName + ".vrm";
-            document.getElementById(modelName).style.border = "2px solid black";
+            document.getElementById(modelName).style.border = "2px solid #49a0c5";
 
             // Deselect all the other characters...
             let otherCharacters = document.getElementsByClassName("character-box");
@@ -142,8 +142,8 @@
                 embodiedVR.joinRoom(roomCode, data);
 
                 let roomURL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/room.html#" + roomCode;
-                document.getElementById("error-message").innerHTML = "Open this link in a new window (not a tab): <br /> <code>" + roomURL + "</code>";
-                document.getElementById("error-message").innerText += "Your generated code is: " + generatedCode;
+                document.getElementById("error-message").innerHTML = "Open this link in a new window (not a tab): <br /> <p style='color:#EEEEEE;'>" + roomURL + "</p> <br />";
+                document.getElementById("error-message").innerHTML += "<p>Your generated code is: <p style='color:#EEEEEE;'>" + generatedCode + "</p></p>";
 
                 document.getElementById("welcome-message").style.display = "none";
                 document.getElementById("enter-button").style.display = "none";
