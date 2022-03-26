@@ -1,0 +1,17 @@
+#example-application {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    position: relative;
+    /* left: 0;
+    right: 0; */
+    top: 0;
+    /* bottom: 0; */
+    background-color: #FFFFFF40;
+    color: #49a0c5;
+    font-family: 'Inconsolata', monospace;
+  }
