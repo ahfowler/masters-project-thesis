@@ -7,6 +7,7 @@ export const LANDMARK_AREAS = {
     // palm: [0, 5, 9, 13, 17]
     fingerTips: ["indexTip", "middleTip", "ringTip", "pinkyTip", "thumbTip"],
     indexTips: ["leftIndexTip", "rightIndexTip"],
+    pinchFingers: ["indexTip", "thumbTip"],
     palm: ["bottomPalm", "bottomIndex", "bottomMiddle", "bottomRing", "bottomPinky"],
 }
 
@@ -64,6 +65,662 @@ export const LANDMARK_POINTS = {
 
 // -------------------------------------------
 // Interactive Gestures
+let gestureDescriptions = {};
+
+function convertDesciption(descriptionName, descriptions) {
+    var gestureDescription = new fp.GestureDescription(descriptionName);
+    gestureDescriptions[descriptionName] = gestureDescription;
+
+    for (var i = 0; i < descriptions.length; i++) {
+        if (descriptions[i][0] == "addCurl") { // This is a curl description.
+            let finger = descriptions[i][1];
+            let curl = descriptions[i][2];
+            let confidence = descriptions[i][3];
+
+            gestureDescriptions[descriptionName].addCurl(fp.Finger[finger], fp.FingerCurl[curl], confidence);
+
+        } else if (descriptions[i][0] == "addDirection") {
+            let finger = descriptions[i][1];
+            let direction = descriptions[i][2];
+            let confidence = descriptions[i][3];
+
+            gestureDescriptions[descriptionName].addDirection(fp.Finger[finger], fp.FingerDirection[direction], confidence);
+        }
+    }
+}
+
+convertDesciption('pinch', [
+    [
+        "addCurl",
+        "Thumb",
+        "NoCurl",
+        1
+      ],
+      [
+        "addDirection",
+        "Thumb",
+        "VerticalUp",
+        1
+      ],
+      [
+        "addDirection",
+        "Thumb",
+        "DiagonalUpLeft",
+        0.6666666666666666
+      ],
+      [
+        "addDirection",
+        "Thumb",
+        "DiagonalUpRight",
+        0.3333333333333333
+      ],
+      [
+        "addCurl",
+        "Index",
+        "NoCurl",
+        0.7647058823529411
+      ],
+      [
+        "addCurl",
+        "Index",
+        "HalfCurl",
+        1
+      ],
+      [
+        "addDirection",
+        "Index",
+        "DiagonalUpLeft",
+        1
+      ],
+      [
+        "addDirection",
+        "Index",
+        "VerticalUp",
+        0.13636363636363635
+      ],
+      [
+        "addDirection",
+        "Index",
+        "DiagonalUpRight",
+        0.22727272727272727
+      ],
+      [
+        "addCurl",
+        "Middle",
+        "NoCurl",
+        0.5
+      ],
+      [
+        "addCurl",
+        "Middle",
+        "HalfCurl",
+        1
+      ],
+      [
+        "addDirection",
+        "Middle",
+        "VerticalUp",
+        0.9230769230769231
+      ],
+      [
+        "addDirection",
+        "Middle",
+        "DiagonalUpLeft",
+        1
+      ],
+      [
+        "addDirection",
+        "Middle",
+        "DiagonalUpRight",
+        0.38461538461538464
+      ],
+      [
+        "addCurl",
+        "Ring",
+        "NoCurl",
+        0.36363636363636365
+      ],
+      [
+        "addCurl",
+        "Ring",
+        "HalfCurl",
+        1
+      ],
+      [
+        "addDirection",
+        "Ring",
+        "VerticalUp",
+        0.9166666666666666
+      ],
+      [
+        "addDirection",
+        "Ring",
+        "DiagonalUpLeft",
+        1
+      ],
+      [
+        "addDirection",
+        "Ring",
+        "DiagonalUpRight",
+        0.5833333333333334
+      ],
+      [
+        "addCurl",
+        "Pinky",
+        "HalfCurl",
+        1
+      ],
+      [
+        "addCurl",
+        "Pinky",
+        "NoCurl",
+        0.07142857142857142
+      ],
+      [
+        "addDirection",
+        "Pinky",
+        "VerticalUp",
+        1
+      ],
+      [
+        "addDirection",
+        "Pinky",
+        "DiagonalUpLeft",
+        0.2631578947368421
+      ],
+      [
+        "addDirection",
+        "Pinky",
+        "DiagonalUpRight",
+        0.3157894736842105
+      ],
+
+]);
+convertDesciption('nopinch', [[
+    "addCurl",
+    "Thumb",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "HorizontalLeft",
+    0.07142857142857142
+  ],
+  [
+    "addCurl",
+    "Index",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Thumb",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addCurl",
+    "Index",
+    "NoCurl",
+    1
+  ],
+  [
+    "addCurl",
+    "Index",
+    "HalfCurl",
+    0.034482758620689655
+  ],
+  [
+    "addDirection",
+    "Index",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "DiagonalUpRight",
+    0.15384615384615385
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "VerticalUp",
+    1
+  ]
+]);
+convertDesciption('open hand', [[
+    "addCurl",
+    "Thumb",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "HorizontalLeft",
+    0.42857142857142855
+  ],
+  [
+    "addCurl",
+    "Index",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "VerticalUp",
+    0.25
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "DiagonalUpLeft",
+    0.07142857142857142
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "VerticalUp",
+    0.36363636363636365
+  ],
+  [
+    "addCurl",
+    "Thumb",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "HorizontalRight",
+    0.5789473684210527
+  ],
+  [
+    "addCurl",
+    "Index",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "VerticalUp",
+    0.5
+  ],
+  [
+    "addDirection",
+    "Index",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "DiagonalUpLeft",
+    0.15384615384615385
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "VerticalUp",
+    0.36363636363636365
+  ]
+]);
+convertDesciption('fist', [[
+    "addCurl",
+    "Thumb",
+    "NoCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Index",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "DiagonalUpRight",
+    0.034482758620689655
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "DiagonalUpRight",
+    1
+  ],
+  [
+    "addCurl",
+    "Thumb",
+    "HalfCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Thumb",
+    "VerticalUp",
+    0.875
+  ],
+  [
+    "addCurl",
+    "Index",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Index",
+    "HorizontalLeft",
+    0.037037037037037035
+  ],
+  [
+    "addDirection",
+    "Index",
+    "VerticalUp",
+    0.07407407407407407
+  ],
+  [
+    "addCurl",
+    "Middle",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "DiagonalUpLeft",
+    1
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "DiagonalDownLeft",
+    0.045454545454545456
+  ],
+  [
+    "addDirection",
+    "Middle",
+    "VerticalUp",
+    0.3181818181818182
+  ],
+  [
+    "addCurl",
+    "Ring",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "DiagonalUpLeft",
+    0.45
+  ],
+  [
+    "addDirection",
+    "Ring",
+    "DiagonalDownLeft",
+    0.05
+  ],
+  [
+    "addCurl",
+    "Pinky",
+    "FullCurl",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "VerticalUp",
+    1
+  ],
+  [
+    "addDirection",
+    "Pinky",
+    "DiagonalUpLeft",
+    0.034482758620689655
+  ]
+]);
+
+console.log(gestureDescriptions);
 
 // Point Gesture
 const pointDescription = new fp.GestureDescription('point');
@@ -113,6 +770,16 @@ openHandDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.HorizontalL
 openHandDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.HorizontalRight, 0.9);
 openHandDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalUpLeft, 1.0);
 openHandDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalUpRight, 1.0);
+
+// Pinch Gesture
+const pinchDescription = new fp.GestureDescription('pinch');
+pinchDescription.addCurl(fp.Finger.Thumb, fp.FingerCurl.NoCurl, 1.0);
+pinchDescription.addCurl(fp.Finger.Index, fp.FingerCurl.HalfCurl, 1.0);
+pinchDescription.addCurl(fp.Finger.Index, fp.FingerCurl.FullCurl, 0.5);
+pinchDescription.addCurl(fp.Finger.Middle, fp.FingerCurl.NoCurl, 1.0);
+pinchDescription.addCurl(fp.Finger.Ring, fp.FingerCurl.NoCurl, 1.0);
+pinchDescription.addCurl(fp.Finger.Index, fp.FingerCurl.HalfCurl, 1.0);
+
 
 // -------------------------------------------
 // Number Gestures
@@ -273,13 +940,13 @@ for (let finger of [fp.Finger.Index, fp.Finger.Middle, fp.Finger.Ring, fp.Finger
 
 const interactiveGestures = new fp.GestureEstimator([
     pointDescription,
-    fistDescription,
-    openHandDescription
+    gestureDescriptions['fist'],
+    gestureDescriptions['open hand']
 ]);
 
 const dragDropGestures = new fp.GestureEstimator([
-    fistDescription,
-    openHandDescription
+    gestureDescriptions['fist'],
+    gestureDescriptions['open hand']
 ]);
 
 const numberGestures = new fp.GestureEstimator([
@@ -296,17 +963,23 @@ const miscGestures = new fp.GestureEstimator([
     thumbsUpDescription,
     thumbsDownDescription,
     pointDescription,
-    fistDescription,
-    openHandDescription,
+    gestureDescriptions['fist'],
+    gestureDescriptions['open hand'],
 ]);
 
 const demoGestures = new fp.GestureEstimator([
     pointDescription,
-    fistDescription,
+    gestureDescriptions['fist'],
     thumbsUpDescription,
     thumbsDownDescription,
     twoDescription,
 ]);
+
+const pinchGesture = new fp.GestureEstimator([
+    gestureDescriptions['pinch'],
+    gestureDescriptions['open hand']
+]);
+
 
 let currentGestures = {};
 
@@ -314,7 +987,7 @@ let currentGestures = {};
 export function updateGestures(predictions) {
     for (const property in currentGestures) {
         currentGestures[property] = false;
-      }
+    }
 
     if (predictions.length > 0) { // Check both hands...
         let estimatedGestures = dragDropGestures.estimate(predictions[0].landmarks, 7.0);
@@ -344,6 +1017,14 @@ export function updateGestures(predictions) {
                 currentGestures["five"] = true;
             }
         }
+
+        estimatedGestures = pinchGesture.estimate(predictions[0].landmarks, 7.8);
+        for (var i = 0; i < estimatedGestures.gestures.length; i++) {
+            if (estimatedGestures.gestures[i] && estimatedGestures.gestures[i].name == "pinch") {
+                currentGestures["pinch"] = true;
+            }
+        }
+
     }
 
     return currentGestures;

@@ -40,6 +40,21 @@
 
     <!-- Example-Specific Imports -->
     <link rel="stylesheet" href="./style.css">
+
+    <script>
+        var useScroll = false;
+
+        function toggleScroll() {
+            useScroll = !useScroll;
+            
+            if (useScroll) {
+                document.getElementById("enable-scroll-button").innerText = "Scroll Enabled";
+            } else {
+                document.getElementById("enable-scroll-button").innerText = "Scroll Disabled";
+            }
+            // console.log("Scroll: ", useScroll);
+        }
+    </script>
 </head>
 
 <body>
@@ -142,6 +157,33 @@
                     Five
                 </div>
             </div>
+
+            <div class="scroll-button" onclick="scrollToSection('gestures')">
+                <div class="arrow bounce">
+                </div>
+            </div>
+
+            <br />
+
+            <h2 id="click">You can click on items.</h2>
+            <p>Try changing the color of the box by pinching it with all of your fingers.</p>
+
+            <div id="click-scroll-boxes" class="box-collection">
+                <div id="click-box"></div>
+            </div>
+
+            <div class="scroll-button" onclick="scrollToSection('gestures')">
+                <div class="arrow bounce">
+                </div>
+            </div>
+
+            <br />
+
+            <h2 id="scroll">You can even scroll a webpage!</h2>
+            <p>Click the "Enable Scroll" button and scroll by making a grab gesture (&#128400; + &#9994;).</p>
+
+            <a id="enable-scroll-button" onclick="toggleScroll()">Enable Scroll</a>
+
         </div>
     </div>
 
@@ -272,6 +314,8 @@
 
         let targetBox = document.getElementById("box");
         let gestureBoxes = document.getElementsByClassName("gesture-box");
+        let clickBox = document.getElementById("click-box");
+        var index = 0; // for clickBox!
 
         gesture.onHands(() => {
             for (var i = 0; i < whiteKeys.length; i++) {
@@ -344,8 +388,24 @@
                     gestureBoxes[i].style.backgroundColor = "transparent";
                 }
             }
-        });
 
+            // Clicking Experience -------------------------------------------------------------------------
+            let colors = ["#FF595E", "#FFCA3A", "#8AC926", "#1982C4", "#6A4C93"];
+
+            gesture.userClicksObject(clickBox, () => {
+                // console.log("clicked box", index);
+                clickBox.style.backgroundColor = colors[index % colors.length];
+                clickBox.innerText = "You clicked this box " + (index+1) + " times!";
+                index++;
+            });
+
+            // Scrolling Experience ---------------------------------------------------------------------------
+
+            if (useScroll) {
+                gesture.enableScroll(window);
+            }
+            
+        });
     </script>
 </body>
 

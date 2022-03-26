@@ -35,7 +35,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  transition: all 1s linear;
+  transition: height 1s linear;
 }
 
 #example-application>#landing-page>h1 {
@@ -64,7 +64,7 @@ body {
 
   width: 100%;
 
-  transition: all 3s linear;
+  transition: height 3s linear;
 }
 
 #example-application>#demo>h2 {
@@ -203,6 +203,28 @@ body {
 
 #example-application>#demo>#gesture-interaction-boxes>.gesture-box>p {
   font-size: 30px;
+}
+
+#example-application>#demo>#click-scroll-boxes>#click-box {
+  height: 197px;
+  width: 197px;
+
+  background-color: #3c6c8a;
+  color: #EEEEEE;
+  text-align: center;
+  padding: 10px;
+}
+
+#hand-pinch-sign {
+  transform: rotate(270deg);
+}
+
+#enable-scroll-button {
+  border: #EEEEEE solid 2px;
+  padding: 0 10px;
+  color: #EEEEEE;
+  cursor: pointer;
+  margin-bottom: 100px;
 }
 
 .scroll-button {

@@ -9,6 +9,10 @@ class DOMElement {
         this.hovered = false;
         this.userWantsToPickUpElement = false;
         this.userPickedUpElement = false;
+        this.userClickedObject = false;
+
+        this.userIsScrolling = false;
+        this.userWantsToScroll = false;
     }
 }
 
@@ -27,7 +31,11 @@ export class Gesture {
     cursor; // Reference for the user's cursor.
     mediapipe; // Reference to MediaPipe engine.
 
+    applicationElementID;
+    scroll = false;
+
     constructor(applicationElementID) { // Default constructor.
+        this.applicationElementID = applicationElementID;
         // Step 0: Add the nessessary CDNs. Better way to bundle?
 
         // Step 1: Assign UUIDs to all the elements on the DOM for easy access.
@@ -230,6 +238,37 @@ export class Gesture {
         }
     }
 
+    userClicksObject(object, clickCallback) {
+        // Get object's Object class.
+        const elementClass = this.getElementByUUID(object.uuid);
+
+        if (elementClass) {
+            if (!elementClass.userClickedObject) {
+                if (this.isMakingGesture("pinch")) {
+                    this.userHoversObject(["indexTip"], object, () => {
+                        this.userHoversObject(["thumbTip"], object, () => {
+                            // User wants to click object.
+                            elementClass.userClickedObject = true;
+                            clickCallback();
+                        }, () => { });
+                    }, () => { });
+                }
+            } else {
+                if (this.isMakingGesture("pinch")) {
+                    this.userHoversObject(["indexTip"], object, () => {
+                        this.userHoversObject(["thumbTip"], object, () => {
+                            elementClass.userClickedObject = true;
+                        }, () => {
+                            elementClass.userClickedObject = false;
+                        });
+                    }, () => { });
+                } else {
+                    elementClass.userClickedObject = false; // As soon as possible, reset it.
+                }
+            }
+        }
+    }
+
     userDragsAndDropsObject(object, pickUpCallback, dragCallback, dropCallback) {
         // Get object's Object class.
         const elementClass = this.getElementByUUID(object.uuid);
@@ -238,7 +277,6 @@ export class Gesture {
             if (!elementClass.userWantsToPickUpObject && !elementClass.userPickedUpObject) {
                 if (this.isMakingGesture("openHand")) {
                     this.userHoversObject(LANDMARK_AREAS.palm, object, () => {
-                        // User wants to pick up object, must close palm now.
                         elementClass.userWantsToPickUpObject = true;
                     }, () => { }, () => { });
                 }
@@ -261,6 +299,80 @@ export class Gesture {
                     this.moveObject(object, LANDMARK_AREAS.palm);
                 } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
                     dropCallback();
+                    elementClass.selected = false;
+                    elementClass.userWantsToPickUpObject = false;
+                    elementClass.userPickedUpObject = false;
+                }
+            }
+        }
+    }
+
+    enableScroll(object) {
+        if (object == window) {
+            object = document.getElementById(this.applicationElementID);
+        }
+
+        // Get object's Object class.
+        const elementClass = this.getElementByUUID(object.uuid);
+
+        if (elementClass) {
+            if (!elementClass.userWantsToPickUpObject && !elementClass.userPickedUpObject) {
+                if (this.isMakingGesture("openHand")) {
+                    this.userHoversObject(LANDMARK_AREAS.palm, object, () => {
+                        elementClass.userWantsToPickUpObject = true;
+                    }, () => { }, () => { });
+                }
+            } else if (elementClass.userWantsToPickUpObject && !elementClass.userPickedUpObject) {
+                if (!this.userHoversObject(LANDMARK_AREAS.palm, object, () => { }, () => { })) {
+                    elementClass.userWantsToPickUpObject = false;
+                    return;
+                }
+
+                if (this.isMakingGesture("closedHand")) {
+                    this.userHoversObject(LANDMARK_AREAS.palm, object, () => {
+                        // User wants to pick up object, must close palm now.
+                        elementClass.userPickedUpObject = true;
+
+                        // Get the current position.
+                        let x, y;
+                        if (this.mediapipe.mpResults.leftHandLandmarks) {
+                            x = map(this.mediapipe.mpResults.leftHandLandmarks[4].x, 0, 1, 0, object.clientWidth);
+                            y = map(this.mediapipe.mpResults.leftHandLandmarks[8].y, 0, 1, 0, object.clientHeight);
+                        } else if (this.mediapipe.mpResults.rightHandLandmarks) {
+                            x = map(this.mediapipe.mpResults.rightHandLandmarks[4].x, 0, 1, 0, object.clientWidth);
+                            y = map(this.mediapipe.mpResults.rightHandLandmarks[8].y, 0, 1, 0, object.clientHeight);
+                        }
+
+                        previousPosition = {x: x, y: y};
+                        // console.log("previous", previousPosition);
+                    }, () => { }, () => { });
+                }
+            } else if (elementClass.userWantsToPickUpObject && elementClass.userPickedUpObject) {
+                if (this.isMakingGesture("closedHand")) {
+                    // Get the current position.
+                    let x, y;
+                    if (this.mediapipe.mpResults.leftHandLandmarks) {
+                        x = map(this.mediapipe.mpResults.leftHandLandmarks[4].x, 0, 1, 0, object.clientWidth);
+                        y = map(this.mediapipe.mpResults.leftHandLandmarks[8].y, 0, 1, 0, object.clientHeight);
+                    } else if (this.mediapipe.mpResults.rightHandLandmarks) {
+                        x = map(this.mediapipe.mpResults.rightHandLandmarks[4].x, 0, 1, 0, object.clientWidth);
+                        y = map(this.mediapipe.mpResults.rightHandLandmarks[8].y, 0, 1, 0, object.clientHeight);
+                    }
+
+                    // console.log("previous", previousPosition);
+
+                    let newPosition = {x: x, y: y};
+
+                    let positionChange = {};
+                    positionChange.x = newPosition.x - previousPosition.x;
+                    positionChange.y = newPosition.y - previousPosition.y;
+
+                    previousPosition = newPosition;
+
+                    // console.log("new position", newPosition);
+                    // console.log("change by", positionChange);
+                    window.scrollBy({top: -positionChange.y / 2});
+                } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
                     elementClass.selected = false;
                     elementClass.userWantsToPickUpObject = false;
                     elementClass.userPickedUpObject = false;
@@ -311,3 +423,9 @@ export class Gesture {
         this.mediapipe.onLoad(callback);
     }
 }
+
+function map(a, in_min, in_max, out_min, out_max) {
+    return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+let previousPosition = {};
