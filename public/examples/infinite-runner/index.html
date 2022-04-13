@@ -38,12 +38,44 @@
     <script src="https://unpkg.com/three@0.132.0/examples/js/objects/Reflector.js"></script>
     <!-- VRM Loader for Three.js -->
     <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
+
+    <link rel="stylesheet" href="../../src/css/gesture.css">
 </head>
 
 <body>
     <div id="TutContainer"></div>
 
     <script type="module">
+        import { Gesture } from "../../src/js/gesture.js";
+
+        // Step 1: Import and initialize Gesture.js
+        var gesture = new Gesture("TutContainer");
+
+        // Define the map function.
+        function map(a, in_min, in_max, out_min, out_max) {
+            return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+
+        // Step 2: Add functions to body parts.
+        // Add a function that runs whenever face appears on camera.
+        gesture.onFace((faceLandmarks) => {
+            if (jumping) return;
+
+            let noseXPosition = faceLandmarks[0].x;
+            noseXPosition = map(noseXPosition, 0, 1, -1.5, 1.5);
+            currentLane = noseXPosition;
+        });
+
+        gesture.styleFaceLandmarks((data) => {
+            if (data.index == 4) {
+                return "red"
+            } else {
+                return "transparent";
+            }
+        }, "transparent", 0, "transparent", 2);
+
+        // Three.js Code --------------------------
+
         import { VRButton } from "https://unpkg.com/three@0.133.0/examples/jsm/webxr/VRButton.js";
         import { ConeGeometry } from "https://unpkg.com/three@0.86.0/src/geometries/ConeGeometry.js";
 
@@ -140,11 +172,11 @@
             */
             window.addEventListener('resize', onWindowResize, false);//resize callback
 
-            document.onkeydown = handleKeyDown;
+            // document.onkeydown = handleKeyDown;
 
             scoreText = document.createElement('div');
             scoreText.style.position = 'absolute';
-            //text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+            // text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
             scoreText.style.width = 100;
             scoreText.style.height = 100;
             //scoreText.style.backgroundColor = "blue";
@@ -155,6 +187,7 @@
 
             var infoText = document.createElement('div');
             infoText.style.position = 'absolute';
+            infoText.style.zIndex = 5;
             infoText.style.width = 100;
             infoText.style.height = 100;
             infoText.style.backgroundColor = "yellow";
@@ -163,6 +196,7 @@
             infoText.style.left = 10 + 'px';
             document.body.appendChild(infoText);
         }
+
         function addExplosion() {
             particleGeometry = new THREE.Geometry();
             for (var i = 0; i < particleCount; i++) {
@@ -177,46 +211,16 @@
             scene.add(particles);
             particles.visible = false;
         }
+
         function createTreesPool() {
-            var maxTreesInPool = 10;
+            var maxTreesInPool = 5;
             var newTree;
             for (var i = 0; i < maxTreesInPool; i++) {
                 newTree = createTree();
                 treesPool.push(newTree);
             }
         }
-        function handleKeyDown(keyEvent) {
-            if (jumping) return;
-            var validMove = true;
-            if (keyEvent.keyCode === 37) {//left
-                if (currentLane == middleLane) {
-                    currentLane = leftLane;
-                } else if (currentLane == rightLane) {
-                    currentLane = middleLane;
-                } else {
-                    validMove = false;
-                }
-            } else if (keyEvent.keyCode === 39) {//right
-                if (currentLane == middleLane) {
-                    currentLane = rightLane;
-                } else if (currentLane == leftLane) {
-                    currentLane = middleLane;
-                } else {
-                    validMove = false;
-                }
-            } else {
-                if (keyEvent.keyCode === 38) {//up, jump
-                    bounceValue = 0.1;
-                    jumping = true;
-                }
-                validMove = false;
-            }
-            //heroSphere.position.x=currentLane;
-            if (validMove) {
-                jumping = true;
-                bounceValue = 0.06;
-            }
-        }
+
         function addHero() {
             var sphereGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
             var sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xe5f2f2, shading: THREE.FlatShading })
@@ -340,7 +344,7 @@
             var midPointVector = new THREE.Vector3();
             var vertexVector = new THREE.Vector3();
             var treeGeometry = new THREE.ConeGeometry(0.5, 1, sides, tiers);
-            console.log(treeGeometry);
+            // console.log(treeGeometry);
             var treeMaterial = new THREE.MeshStandardMaterial({ color: 0x33ff33, shading: THREE.FlatShading });
             var offset;
             midPointVector = treeGeometry.vertices[0].clone();
@@ -422,7 +426,7 @@
                 bounceValue = (Math.random() * 0.04) + 0.005;
             }
             heroSphere.position.y += bounceValue;
-            heroSphere.position.x = THREE.Math.lerp(heroSphere.position.x, currentLane, 2 * clock.getDelta());//clock.getElapsedTime());
+            heroSphere.position.x = THREE.Math.lerp(heroSphere.position.x, currentLane, 2 * clock.getDelta());
             bounceValue -= gravity;
             if (clock.getElapsedTime() > treeReleaseInterval) {
                 clock.start();
@@ -448,7 +452,7 @@
                     treesToRemove.push(oneTree);
                 } else {//check collision
                     if (treePos.distanceTo(heroSphere.position) <= 0.6) {
-                        console.log("hit");
+                        // console.log("hit");
                         hasCollided = true;
                         explode();
                     }
@@ -461,7 +465,7 @@
                 treesInPath.splice(fromWhere, 1);
                 treesPool.push(oneTree);
                 oneTree.visible = false;
-                console.log("remove tree");
+                // console.log("remove tree");
             });
         }
         function doExplosionLogic() {
@@ -505,6 +509,12 @@
             camera.aspect = sceneWidth / sceneHeight;
             camera.updateProjectionMatrix();
         }
+    </script>
+
+    <script type="module">
+
+
+
     </script>
 </body>
 
