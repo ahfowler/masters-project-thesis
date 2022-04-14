@@ -1,0 +1,88 @@
+<head>
+    <title>Gesture.js Examples</title>
+    <meta charset="utf-8">
+    <!-- Download JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Download MediaPipe's Holisitic Model and Support Tools -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+
+    <!-- Download TensorFlow's Handpose Models -->
+    <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
+    <script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
+    <!-- use the WebGL backend (recommended) - you can alternatively use the WASM backend -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+
+    <!-- Download Fingerpose Gesture Recgnition Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js"></script>
+
+    <!-- Download UUID Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
+        integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Basic Three.js -->
+    <script src="https://unpkg.com/three@0.122.0/build/three.js"></script>
+
+    <link rel="stylesheet" href="../../src/css/gesture.css">
+
+    <!-- Pong Game Style -->
+    <style>
+        #embodied-pong {
+            background-color: black;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        #gameCanvas {
+            background-color: black;
+            margin: 10vh;
+        }
+
+        #scoreboard {
+            text-align: center;
+            font-family: Segoe UI, Helvetica, Ubuntu, sans-serif;
+            color: white;
+        }
+
+        #scores {
+            font-size: 600%;
+            padding: 0;
+            margin: 0;
+            color: white;
+        }
+
+        #title {
+            background-color: white;
+            color: black;
+        }
+    </style>
+
+    <script src="./game.js" type="module"></script>
+</head>
+
+<body>
+    <div id="embodied-pong">
+        <div id='gameCanvas'></div>
+        <div id='scoreboard'>
+            <h1 id='scores'>0-0</h1>
+            <h1 id='title'>3D PONG</h1>
+            <h2 id='winnerBoard'>First to 7 wins!</h2>
+            <h3>Move your nose to control the paddle.
+            </h3>
+        </div>
+    </div>
+</body>
+
+</html>

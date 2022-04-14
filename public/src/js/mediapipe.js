@@ -18,6 +18,7 @@ export class MediaPipe {
     camera;
     drawingUtils;
     videoLoaded = false;
+    onloadCallbackCalled = false;
     _onLoadCallback;
     _onEmitResults;
 
@@ -88,8 +89,9 @@ export class MediaPipe {
 
     async onResults(results) {
         if (!this.videoLoaded) {
-            if (this._onLoadCallback) {
+            if (this._onLoadCallback && !this.onloadCallbackCalled) {
                 this._onLoadCallback();
+                this.onloadCallbackCalled = true;
             }
             this.model = await handpose.load(); // Load the HandPose Model from TensorFlow.
             this.videoLoaded = true;
