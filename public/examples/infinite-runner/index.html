@@ -60,7 +60,6 @@
         // Add a function that runs whenever face appears on camera.
         gesture.onFace((faceLandmarks) => {
             if (jumping) return;
-
             let noseXPosition = faceLandmarks[0].x;
             noseXPosition = map(noseXPosition, 0, 1, -1.5, 1.5);
             currentLane = noseXPosition;
@@ -73,6 +72,11 @@
                 return "transparent";
             }
         }, "transparent", 0, "transparent", 2);
+
+        var gestureLoaded = false;
+        gesture.onLoad(() => {
+            gestureLoaded = true;
+        });
 
         // Three.js Code --------------------------
 
@@ -114,9 +118,13 @@
         var explosionPower = 1.06;
         var particles;
         //var stats;
-        var scoreText;
+        var infoText;
         var score;
         var hasCollided;
+        var lives = 5;
+
+        var globalRenderID;
+
 
         init();
 
@@ -174,26 +182,17 @@
 
             // document.onkeydown = handleKeyDown;
 
-            scoreText = document.createElement('div');
-            scoreText.style.position = 'absolute';
-            // text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
-            scoreText.style.width = 100;
-            scoreText.style.height = 100;
-            //scoreText.style.backgroundColor = "blue";
-            scoreText.innerHTML = "0";
-            scoreText.style.top = 50 + 'px';
-            scoreText.style.left = 10 + 'px';
-            document.body.appendChild(scoreText);
-
-            var infoText = document.createElement('div');
+            infoText = document.createElement('div');
             infoText.style.position = 'absolute';
+            infoText.style.textAlign = "center";
+            infoText.style.fontSize = "20px";
+            infoText.style.fontFamily = "Arial, sans-serif";
+            infoText.style.padding = "20px";
             infoText.style.zIndex = 5;
-            infoText.style.width = 100;
-            infoText.style.height = 100;
-            infoText.style.backgroundColor = "yellow";
-            infoText.innerHTML = "UP - Jump, Left/Right - Move";
+            infoText.style.width = "30%";
+            infoText.style.backgroundColor = "#EEEEEE";
+            infoText.innerHTML = "Score: 0";
             infoText.style.top = 10 + 'px';
-            infoText.style.left = 10 + 'px';
             document.body.appendChild(infoText);
         }
 
@@ -205,7 +204,7 @@
             }
             var pMaterial = new THREE.ParticleBasicMaterial({
                 color: 0xfffafa,
-                size: 0.2
+                size: 0.1
             });
             particles = new THREE.Points(particleGeometry, pMaterial);
             scene.add(particles);
@@ -213,7 +212,7 @@
         }
 
         function createTreesPool() {
-            var maxTreesInPool = 5;
+            var maxTreesInPool = 8;
             var newTree;
             for (var i = 0; i < maxTreesInPool; i++) {
                 newTree = createTree();
@@ -419,27 +418,36 @@
         function update() {
             //stats.update();
             //animate
-            rollingGroundSphere.rotation.x += rollingSpeed;
-            heroSphere.rotation.x -= heroRollingSpeed;
-            if (heroSphere.position.y <= heroBaseY) {
-                jumping = false;
-                bounceValue = (Math.random() * 0.04) + 0.005;
-            }
-            heroSphere.position.y += bounceValue;
-            heroSphere.position.x = THREE.Math.lerp(heroSphere.position.x, currentLane, 2 * clock.getDelta());
-            bounceValue -= gravity;
-            if (clock.getElapsedTime() > treeReleaseInterval) {
-                clock.start();
-                addPathTree();
-                if (!hasCollided) {
-                    score += 2 * treeReleaseInterval;
-                    scoreText.innerHTML = score.toString();
+            if (gestureLoaded) {
+                rollingGroundSphere.rotation.x += rollingSpeed;
+                heroSphere.rotation.x -= heroRollingSpeed;
+                if (heroSphere.position.y <= heroBaseY) {
+                    jumping = false;
+                    bounceValue = (Math.random() * 0.04) + 0.005;
                 }
+                heroSphere.position.y += bounceValue;
+                heroSphere.position.x = THREE.Math.lerp(heroSphere.position.x, currentLane, 2 * clock.getDelta());
+                bounceValue -= gravity;
+                if (clock.getElapsedTime() > treeReleaseInterval) {
+                    clock.start();
+                    addPathTree();
+                    if (!hasCollided) {
+                        score += 2 * treeReleaseInterval;
+                        infoText.innerHTML = "Score: " + score.toString();
+                    } else if (hasCollided && lives > 0) {
+                        score += 2 * treeReleaseInterval;
+                        infoText.innerHTML = "Score: " + score.toString();
+                        hasCollided = false;
+                        lives--;
+                    } else {
+                        gameOver();
+                    }
+                }
+                doTreeLogic();
+                doExplosionLogic();
+                render();
             }
-            doTreeLogic();
-            doExplosionLogic();
-            render();
-            requestAnimationFrame(update);//request next update
+            globalRenderID = requestAnimationFrame(update);//request next update
         }
         function doTreeLogic() {
             var oneTree;
@@ -498,8 +506,13 @@
             renderer.render(scene, camera);//draw
         }
         function gameOver() {
-            //cancelAnimationFrame( globalRenderID );
-            //window.clearInterval( powerupSpawnIntervalID );
+            if (globalRenderID) {
+                infoText.innerHTML = "Game over! <br /> Score: " + score.toString();
+                infoText.innerHTML += " <br /> Refresh to play again."
+                cancelAnimationFrame(globalRenderID);
+                // rollingSpeed = 0.0;
+            }
+            // window.clearInterval( powerupSpawnIntervalID );
         }
         function onWindowResize() {
             //resize & align
