@@ -1,6 +1,6 @@
 // Three.js Code --------------------------
 
-import { VRButton } from "https://unpkg.com/three@0.126.0/examples/jsm/webxr/VRButton.js";
+import { VRButton } from "https://unpkg.com/three@0.122.0/examples/jsm/webxr/VRButton.js";
 import { Gesture } from "../../src/js/gesture.js";
 
 // --------------------------------------------- //
@@ -56,8 +56,8 @@ function setup() {
 
 function createScene() {
     // set the scene size
-    var WIDTH = 800,
-        HEIGHT = 500;
+    var WIDTH = window.innerWidth,
+        HEIGHT = window.innerHeight;
 
     // set some camera attributes
     var VIEW_ANGLE = 50,
@@ -216,6 +216,7 @@ function createScene() {
         paddle1Material);
 
     // // add the sphere to the scene
+    paddle1.name = "playerPaddle";
     scene.add(paddle1);
     paddle1.receiveShadow = true;
     paddle1.castShadow = true;
@@ -331,13 +332,43 @@ function createScene() {
 
     // MAGIC SHADOW CREATOR DELUXE EDITION with Lights PackTM DLC
     renderer.shadowMapEnabled = true;
+
+    document.body.appendChild( VRButton.createButton( renderer ) );
+    renderer.xr.enabled = true;
+    renderer.setAnimationLoop( function () {
+        draw();
+    } );
+    document.getElementById("VRButton").addEventListener('click', () => {
+        var selectedObject = scene.getObjectByName("playerPaddle");
+        if (selectedObject) {
+            // Create a dolly.
+            var dolly = new THREE.Group();
+            dolly.add(camera);
+            scene.add(dolly);
+
+            // Update the dolly.
+            camera.near = 0.25;
+            camera.fov = 30;
+            camera.far = 5000;
+
+            // dolly.position.z += 0.1;
+            // dolly.position.y -= 0.15;
+            dolly.rotation.y +=  -Math.PI / 2;
+            dolly.rotation.x += Math.PI / 2;
+
+            selectedObject.add(dolly);
+        }
+    });
 }
 
 function draw() {
-    // draw THREE.JS scene
+    // // draw THREE.JS scene
     renderer.render(scene, camera);
     // loop draw function call
-    requestAnimationFrame(draw);
+    // renderer.setAnimationLoop( function () {
+
+    //     renderer.render( scene, camera );
+    // } );
 
     ballPhysics();
     paddlePhysics();
