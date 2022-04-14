@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rembound.com Example</title>
+
+    <!-- Download JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Download MediaPipe's Holisitic Model and Support Tools -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
+
+    <!-- Download TensorFlow's Handpose Models -->
+    <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
+    <script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
+    <!-- use the WebGL backend (recommended) - you can alternatively use the WASM backend -->
+    <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
+    <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+
+    <!-- Download Fingerpose Gesture Recgnition Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js"></script>
+
+    <!-- Download UUID Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"
+        integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="../../src/css/gesture.css">
+
+    <style>
+        #bubble-shooter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script>
+        var setUp = () => { };
+        var onMouseDown = () => {};
+        var onMouseMove = () => {};
+    </script>
+    <script src="./script.js"></script>
+</head>
+
+<body>
+    <div id="bubble-shooter">
+        <canvas id="viewport" width="628" height="628"></canvas>
+    </div>
+
+    <script type='module'>
+        import { Gesture } from "../../src/js/gesture.js";
+        // Step 1: Import and initialize Gesture.js
+        var gesture = new Gesture("bubble-shooter");
+        var cursorPositions = {x: 0, y: 0};
+
+        // Step 2: Add functions to body parts.
+        // Add a function that runs whenever face appears on camera.
+        var madeFist = false;
+        gesture.onHands(() => {
+            // console.log(gesture.mediapipe.currentGestures);
+            if (gesture.isMakingGesture("closedHand")) {
+                // console.log("move arrow");
+                let cursor = gesture.getBodyPoint("indexTip");
+                cursorPositions.x = cursor.x;
+                cursorPositions.y = cursor.y;
+                madeFist = true;
+                onMouseMove(cursorPositions);
+            } else if (madeFist && gesture.isMakingGesture("openHand")) {
+                // console.log("shoot")
+                madeFist = false;
+                onMouseDown(cursorPositions);
+            }
+        });
+
+        gesture.styleRightHandLandmarks("blue", "transparent", 0, "blue", 2);
+        gesture.styleLeftHandLandmarks("red", "transparent", 0, "red", 2);
+
+        gesture.onLoad(() => {
+            setUp();
+        });
+    </script>
+</body>
+
+</html>

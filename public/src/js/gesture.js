@@ -175,6 +175,37 @@ export class Gesture {
 
     // Interactions -----------------------------------------------------------------------------
 
+    getBodyPoint(bodyPoint) {
+        // Define the map function.
+        function map(a, in_min, in_max, out_min, out_max) {
+            return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+
+        let landmarkPoint = LANDMARK_POINTS[bodyPoint];
+
+        let x, y;
+
+        if ((bodyPoint == "indexTip" || bodyPoint == "ringTip" || bodyPoint == "middleTip" || bodyPoint == "pinkyTip" || bodyPoint == "thumbTip" || bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky")
+            && this.mediapipe.mpResults.leftHandLandmarks) {
+            x = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+            y = map(this.mediapipe.mpResults.leftHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+        } else if ((bodyPoint == "indexTip" || bodyPoint == "ringTip" || bodyPoint == "middleTip" || bodyPoint == "pinkyTip" || bodyPoint == "thumbTip" || bodyPoint == "bottomPalm" || bodyPoint == "bottomIndex" || bodyPoint == "bottomMiddle" || bodyPoint == "bottomRing" || bodyPoint == "bottomPinky")
+            && this.mediapipe.mpResults.rightHandLandmarks) {
+            x = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].x, 0, 1, 0, this.mediapipe.canvasElement.clientWidth);
+            y = map(this.mediapipe.mpResults.rightHandLandmarks[landmarkPoint].y, 0, 1, 0, this.mediapipe.canvasElement.clientHeight);
+        } else {
+            return; // bodyPoint is not detected.
+        }
+
+        // console.log(x, y);
+
+        this.cursor.x = x;
+        this.cursor.y = y;
+
+        // console.log(x, y);
+        return {x: x, y: y};
+    }
+
     userHoversObject(bodyPoints, element, trueCallback, falseCallback) {
         // Define the map function.
         function map(a, in_min, in_max, out_min, out_max) {
@@ -343,7 +374,7 @@ export class Gesture {
                             y = map(this.mediapipe.mpResults.rightHandLandmarks[8].y, 0, 1, 0, object.clientHeight);
                         }
 
-                        previousPosition = {x: x, y: y};
+                        previousPosition = { x: x, y: y };
                         // console.log("previous", previousPosition);
                     }, () => { }, () => { });
                 }
@@ -361,7 +392,7 @@ export class Gesture {
 
                     // console.log("previous", previousPosition);
 
-                    let newPosition = {x: x, y: y};
+                    let newPosition = { x: x, y: y };
 
                     let positionChange = {};
                     positionChange.x = newPosition.x - previousPosition.x;
@@ -371,7 +402,7 @@ export class Gesture {
 
                     // console.log("new position", newPosition);
                     // console.log("change by", positionChange);
-                    window.scrollBy({top: -positionChange.y / 2});
+                    window.scrollBy({ top: -positionChange.y / 2 });
                 } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
                     elementClass.selected = false;
                     elementClass.userWantsToPickUpObject = false;
