@@ -325,10 +325,12 @@ export class Gesture {
                     }, () => { }, () => { });
                 }
             } else if (elementClass.userWantsToPickUpObject && elementClass.userPickedUpObject) {
+                console.log(this.isMakingGesture("closedHand"));
                 if (this.isMakingGesture("closedHand")) {
                     dragCallback();
                     this.moveObject(object, LANDMARK_AREAS.palm);
-                } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
+                } else if (!this.isMakingGesture("closedHand") && this.isMakingGesture("openHand") && LANDMARK_AREAS.palm) {
+                    console.log("droppped");
                     dropCallback();
                     elementClass.selected = false;
                     elementClass.userWantsToPickUpObject = false;

@@ -155,7 +155,7 @@ const rigRotation = (
     name,
     rotation = { x: 0, y: 0, z: 0 },
     dampener = 1.0,
-    lerpAmount = 0.15,
+    lerpAmount = 0.30,
 ) => {
     if (!currentVrm) { return }
     const Part = currentVrm.humanoid.getBoneNode(
@@ -177,7 +177,7 @@ const rigPosition = (
     name,
     position = { x: 0, y: 0, z: 0 },
     dampener = 0.09,
-    lerpAmount = 0.01,
+    lerpAmount = 0.05,
 ) => {
     if (!currentVrm) { return }
     const Part = currentVrm.humanoid.getBoneNode(
