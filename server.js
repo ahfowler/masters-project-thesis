@@ -149,6 +149,32 @@ var allClients = [];
 io.on('connection', (socket) => {
     allClients.push(socket);
 
+    socket.on('joinPongGame', (roomNumber) => {
+        try {
+            socket.clientType = "pongPlayer";
+            socket.roomNumber = roomNumber;
+
+            // console.log(data.name + " " + socket.id + " has joined room: " + roomNumber)
+            socket.join(roomNumber);
+        } catch (e) {
+            console.log('[error]', 'join room :', e);
+            socket.emit('error', 'couldnt perform requested action');
+        }
+    });
+
+    socket.on('connectPongRoom', (roomNumber) => {
+        try {
+            socket.clientType = "pongRoom";
+            socket.roomNumber = roomNumber;
+
+            socket.join(roomNumber);
+            // console.log("classroom " + socket.id + " " + roomNumber + " is online");
+        } catch (e) {
+            console.log('[error]', 'join room :', e);
+            socket.emit('error', 'couldnt perform requested action');
+        }
+    });
+
     socket.on('joinRoom', (roomNumber, data) => {
         try {
             socket.clientType = "user";

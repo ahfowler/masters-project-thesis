@@ -2,6 +2,7 @@
 
 import { VRButton } from "https://unpkg.com/three@0.122.0/examples/jsm/webxr/VRButton.js";
 import { Gesture } from "../../src/js/gesture.js";
+import { PongRoom } from "../../src/js/virtualreality.js";
 
 // --------------------------------------------- //
 // ------- 3D PONG built with Three.JS --------- //
@@ -21,11 +22,11 @@ var fieldWidth = 400, fieldHeight = 200;
 
 // paddle variables
 var paddleWidth, paddleHeight, paddleDepth, paddleQuality;
-var paddle1DirY = 0, paddle2DirY = 0, paddleSpeed = 4;
+var paddle1DirY = 0, paddle2DirY = 0, paddleSpeed = 2;
 
 // ball variables
 var ball, paddle1, paddle2;
-var ballDirX = 1, ballDirY = 1, ballSpeed = 6;
+var ballDirX = 1, ballDirY = 1, ballSpeed = 2.3;
 
 // game-related variables
 var score1 = 0, score2 = 0;
@@ -33,13 +34,21 @@ var score1 = 0, score2 = 0;
 var maxScore = 7;
 
 // set opponent reflexes (0 - easiest, 1 - hardest)
-var difficulty = 0.3;
+var difficulty = 0.2;
+
+var currentRoom;
 
 // ------------------------------------- //
 // ------- GAME FUNCTIONS -------------- //
 // ------------------------------------- //
 
 function setup() {
+    let roomNumber = window.location.hash.substring(1);
+
+    if (roomNumber) {
+        document.title = "Room " + roomNumber;
+        currentRoom = new PongRoom(roomNumber);
+    }
     // update the board to reflect the max score for match win
     document.getElementById("winnerBoard").innerHTML = "First to " + maxScore + " wins!";
 
@@ -333,47 +342,34 @@ function createScene() {
     // MAGIC SHADOW CREATOR DELUXE EDITION with Lights PackTM DLC
     renderer.shadowMapEnabled = true;
 
-    document.body.appendChild( VRButton.createButton( renderer ) );
+    document.body.appendChild(VRButton.createButton(renderer));
     renderer.xr.enabled = true;
-    renderer.setAnimationLoop( function () {
+    renderer.setAnimationLoop(function () {
         draw();
-    } );
-    document.getElementById("VRButton").addEventListener('click', () => {
-        var selectedObject = scene.getObjectByName("playerPaddle");
-        if (selectedObject) {
-            // Create a dolly.
-            var dolly = new THREE.Group();
-            dolly.add(camera);
-            scene.add(dolly);
-
-            // Update the dolly.
-            camera.near = 0.25;
-            camera.fov = 30;
-            camera.far = 5000;
-
-            // dolly.position.z += 0.1;
-            // dolly.position.y -= 0.15;
-            dolly.rotation.y +=  -Math.PI / 2;
-            dolly.rotation.x += Math.PI / 2;
-
-            selectedObject.add(dolly);
-        }
     });
 }
 
+// Define the map function.
+function map(a, in_min, in_max, out_min, out_max) {
+    return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 function draw() {
+    if (currentRoom.results) {
+        let noseXPosition = currentRoom.results[0].x;
+        noseXPosition = map(noseXPosition, 0, 1, -fieldHeight * 0.80, fieldHeight * 0.80);
+        paddle1.position.y = -noseXPosition;
+    }
+
+
     // // draw THREE.JS scene
     renderer.render(scene, camera);
-    // loop draw function call
-    // renderer.setAnimationLoop( function () {
-
-    //     renderer.render( scene, camera );
-    // } );
 
     ballPhysics();
     paddlePhysics();
     cameraPhysics();
     opponentPaddleMovement();
+
 }
 
 function ballPhysics() {
@@ -571,32 +567,28 @@ function matchScoreCheck() {
 }
 
 document.body.onload = () => {
-        // Step 1: Import and initialize Gesture.js
-        var gesture = new Gesture("embodied-pong");
+    setup();
 
-        // Define the map function.
-        function map(a, in_min, in_max, out_min, out_max) {
-            return (a - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    document.getElementById("VRButton").addEventListener('click', () => {
+        // Turn on VR Mode
+        var selectedObject = scene.getObjectByName("playerPaddle");
+        if (selectedObject) {
+            // Create a dolly.
+            var dolly = new THREE.Group();
+            dolly.add(camera);
+            scene.add(dolly);
+
+            // Update the dolly.
+            camera.near = 0.25;
+            camera.fov = 30;
+            camera.far = 5000;
+
+            // dolly.position.z += 0.1;
+            // dolly.position.y -= 0.15;
+            dolly.rotation.y += -Math.PI / 2;
+            dolly.rotation.x += Math.PI / 2;
+
+            selectedObject.add(dolly);
         }
-
-        var noseXPosition = 0;
-        // Step 2: Add functions to body parts.
-        // Add a function that runs whenever face appears on camera.
-        gesture.onFace((faceLandmarks) => {
-            noseXPosition = faceLandmarks[0].x;
-            noseXPosition = map(noseXPosition, 0, 1, -fieldHeight * 0.80, fieldHeight * 0.80);
-            paddle1.position.y = -noseXPosition;
-        });
-
-        gesture.styleFaceLandmarks((data) => {
-            if (data.index == 4) {
-                return "red"
-            } else {
-                return "transparent";
-            }
-        }, "transparent", 0, "transparent", 2);
-
-        gesture.onLoad(() => {
-            setup();
-        });
+    });
 };

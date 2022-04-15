@@ -1,5 +1,67 @@
 import { KalidoKit } from "./kalidokit.js";
 
+// VR Game Code ------------------------
+export class PongCamera {
+    gesture;
+    socket;
+
+    user;
+
+    constructor(gestureObject) {
+        this.gesture = gestureObject;
+        this.socket = io();
+
+        // Set up the user's avatar.
+        this.user = {};
+        this.user.socketID = this.socket.id;
+        this.user.roomNumber;
+
+        this.gesture.mediapipe._onEmitCallback = () => {
+            if (this.user.roomNumber) {
+                this.socket.emit('recievedMPResults', this.gesture.mediapipe.mpResults, this.user.socketID, this.user.roomNumber); // Send the pure results to mobile phone.
+            }
+        }
+    }
+
+    joinRoom(roomNumber) {
+        this.user.roomNumber = roomNumber;
+        this.user.socketID = this.socket.id;
+        this.gesture.mediapipe._onEmitCallback = () => {
+            // console.log(this.avatar.roomNumber, this.avatar.socketID);
+            if (this.user.roomNumber) {
+                this.socket.emit('recievedMPResults', this.gesture.mediapipe.mpResults, this.user.socketID, this.user.roomNumber); // Send the pure results to mobile phone.
+            }
+        }
+
+        this.socket.emit("joinPongGame", roomNumber);
+    }
+}
+
+export class PongRoom {
+    roomNumber;
+    socket;
+
+    results;
+
+    constructor (roomNumber) {
+        this.roomNumber = roomNumber;
+        this.socket = io();
+        
+        var updateResults = (results) => {
+            this.results = results;
+        }
+
+        this.socket.on('sentMPResults', function (results) {
+            updateResults(results.faceLandmarks);
+        });
+
+        this.socket.emit("connectPongRoom", roomNumber);
+    }
+
+}
+
+// KalidoKit Code -------------------------
+
 export class VirtualRealityCamera {
     gesture;
     socket;

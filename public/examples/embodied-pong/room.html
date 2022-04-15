@@ -1,5 +1,5 @@
 <head>
-    <title>Gesture.js | Embodied Ping Pong</title>
+    <title>Room</title>
     <meta charset="utf-8">
     <!-- Download JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -37,48 +37,63 @@
         crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../../src/css/gesture.css">
+
+    <!-- Pong Game Style -->
+    <style>
+        #embodied-pong {
+            background-color: black;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        #gameCanvas {
+            background-color: black;
+            margin: 10vh;
+        }
+
+        #scoreboard {
+            text-align: center;
+            font-family: Segoe UI, Helvetica, Ubuntu, sans-serif;
+            position: absolute;
+            top: 10;
+            right: 10;
+            color: white;
+            font-size: 12px;
+            background-color: black;
+        }
+
+        #scores {
+            font-size: 600%;
+            padding: 0;
+            margin: 0;
+            color: white;
+        }
+
+        #title {
+            background-color: white;
+            color: black;
+        }
+    </style>
+
+    <script src="./game.js" type="module"></script>
 </head>
 
 <body>
     <div id="embodied-pong">
-        <div id="roomLink"></div>
+        <div id="roomLink" style="display: none;"></div>
+        <div id='gameCanvas'></div>
+        <div id='scoreboard'>
+            <h1 id='scores'>0-0</h1>
+            <h1 id='title'>3D PONG</h1>
+            <h2 id='winnerBoard'>First to 7 wins!</h2>
+            <h3>Move your nose to control the paddle.
+            </h3>
+        </div>
     </div>
-
-    <script type="module">
-        import { Gesture } from "../../src/js/gesture.js";
-        import { PongCamera } from "../../src/js/virtualreality.js";
-
-        // Step 1: Import and initialize Gesture.js
-        var gesture = new Gesture("embodied-pong");
-        // Turn into a camera.
-        var embodiedVR = new PongCamera(gesture); // This rigs your gestures to an avatar and emits the coordinates.
-
-        // Assign the emit to the room.
-        // Generate a code for the user.
-        var generatedCode = (function makeID(length) {
-            var result = '';
-            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            var charactersLength = characters.length;
-            for (var i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() *
-                    charactersLength));
-            }
-            return result;
-        })(5);
-        let roomCode = generatedCode;
-        embodiedVR.joinRoom(roomCode);
-        let roomURL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/room.html#" + roomCode;
-
-        document.getElementById("roomLink").innerText = "Enter your pong game at this link: " + roomURL;
-
-        const playButton = document.createElement("button");
-        playButton.innerText = "Play Game";
-        document.getElementById("embodied-pong").appendChild(playButton);
-        playButton.onclick = function (event) {
-            window.open(roomURL, '_blank', 'location=yes,height=800,width=1300');
-        }
-
-    </script>
 </body>
 
 </html>
