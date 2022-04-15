@@ -403,9 +403,9 @@ export class Gesture {
                     previousPosition = newPosition;
 
                     // console.log("new position", newPosition);
-                    // console.log("change by", positionChange);
-                    window.scrollBy({ top: -positionChange.y / 2 });
-                } else if (this.isMakingGesture("openHand"), LANDMARK_AREAS.palm) {
+
+                    window.scrollBy({ top: -positionChange.y / 3 });
+                } else if (!this.isMakingGesture("closedHand") && this.isMakingGesture("openHand") && LANDMARK_AREAS.palm) {
                     elementClass.selected = false;
                     elementClass.userWantsToPickUpObject = false;
                     elementClass.userPickedUpObject = false;
