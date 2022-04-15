@@ -208,7 +208,7 @@ function createScene() {
 
     // // set up the paddle vars
     paddleWidth = 10;
-    paddleHeight = 30;
+    paddleHeight = 35;
     paddleDepth = 10;
     paddleQuality = 1;
 
@@ -358,7 +358,7 @@ function draw() {
     if (currentRoom.results) {
         let noseXPosition = currentRoom.results[0].x;
         noseXPosition = map(noseXPosition, 0, 1, -fieldHeight * 0.80, fieldHeight * 0.80);
-        paddle1.position.y = -noseXPosition;
+        paddle1.position.y = ((1-0.1)*paddle1.position.y+0.1*(-noseXPosition));
     }
 
 

@@ -69,14 +69,15 @@
         embodiedVR.joinRoom(roomCode);
         let roomURL = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/room.html#" + roomCode;
 
-        document.getElementById("roomLink").innerText = "Enter your pong game at this link: " + roomURL;
+        document.getElementById("roomLink").innerHTML = "Enter your pong game at this link: " + roomURL;
+        document.getElementById("roomLink").innerHTML += " <br/> Make sure to leave this page open to track your movement, and enter this link in a different window."
 
-        const playButton = document.createElement("button");
-        playButton.innerText = "Play Game";
-        document.getElementById("embodied-pong").appendChild(playButton);
-        playButton.onclick = function (event) {
-            window.open(roomURL, '_blank', 'location=yes,height=800,width=1300');
-        }
+        // const playButton = document.createElement("button");
+        // playButton.innerText = "Play Game";
+        // document.getElementById("embodied-pong").appendChild(playButton);
+        // playButton.onclick = function (event) {
+        //     window.open(roomURL, '_blank', 'height=800,width=1300');
+        // }
 
     </script>
 </body>
